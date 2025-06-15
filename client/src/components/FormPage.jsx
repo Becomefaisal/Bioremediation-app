@@ -62,7 +62,52 @@ const FormPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/samples', formData);
+      // Transform formData to match backend schema
+      const payload = {
+        location: formData.location,
+        method: {
+          name: formData.treatmentMethod,
+          category: '',
+          description: ''
+        },
+        sampleMeta: {
+          batchId: `Batch${new Date().toISOString().slice(0, 10)}-${Math.random().toString(36).substring(2, 7)}`,
+          operator: '',
+          timestamp: new Date().toISOString()
+        },
+        beforeMeasurements: {
+          waterQuality: { ...formData.waterQuality.before },
+          dye: {
+            name: formData.dyeParameters.dyeName,
+            initialConcentration: Number(formData.dyeParameters.initialConcentration),
+            absorbanceInitial: Number(formData.dyeParameters.absorbanceBefore),
+            wavelength: 0 // You can add a field for wavelength if needed
+          },
+          heavyMetals: {
+            Cr: Number(formData.heavyMetals.before.Cr),
+            Pb: Number(formData.heavyMetals.before.Pb),
+            Nitrates: Number(formData.heavyMetals.before.Nitrates),
+            Ammonia: Number(formData.heavyMetals.before.Ammonia)
+          }
+        },
+        afterMeasurements: {
+          waterQuality: { ...formData.waterQuality.after },
+          dye: {
+            name: formData.dyeParameters.dyeName,
+            finalConcentration: Number(formData.dyeParameters.finalConcentration),
+            absorbanceFinal: Number(formData.dyeParameters.absorbanceAfter),
+            wavelength: 0 // You can add a field for wavelength if needed
+          },
+          heavyMetals: {
+            Cr: Number(formData.heavyMetals.after.Cr),
+            Pb: Number(formData.heavyMetals.after.Pb),
+            Nitrates: Number(formData.heavyMetals.after.Nitrates),
+            Ammonia: Number(formData.heavyMetals.after.Ammonia)
+          }
+        },
+        note: ''
+      };
+      await axios.post('/api/samples/add', payload);
       alert('Sample submitted!');
     } catch (err) {
       alert('Error submitting sample');

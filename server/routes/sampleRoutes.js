@@ -51,10 +51,10 @@ router.get('/all', async (req, res) => {
   }
 });
 
-// Compare average reduction for a parameter between two methods
-router.post('/compare-methods', async (req, res) => {
+// Compare average reduction for a parameter between two methods (now GET)
+router.get('/compare-methods', async (req, res) => {
   try {
-    const { param, methodA, methodB } = req.body;
+    const { param, methodA, methodB } = req.query;
     if (!param || !methodA || !methodB) return res.status(400).json({ message: 'Missing fields' });
     // Find all 'after' samples for both methods
     const afterSamples = await SampleEntry.find({
