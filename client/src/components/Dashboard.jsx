@@ -273,10 +273,10 @@ const Dashboard = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
               <XAxis dataKey="batch" stroke="#fff" />
               <YAxis stroke="#fff" />
-              <Tooltip contentStyle={{background:'#232323',color:'#fff',border:'1px solid #444'}}/>
+              <Tooltip contentStyle={{background:'#232323',color:'#fff',border:'1px solid #444'}} cursor={{ fill: 'rgba(87, 104, 139, 0.25)' }}/>
               <Legend wrapperStyle={{color:'#fff'}}/>
-              <Bar dataKey="Before" fill="#4f8cff" /> {/* blue for before */}
-              <Bar dataKey="After" fill="#ffb347" /> {/* orange-yellow for after */}
+              <Bar dataKey="Before" fill="#4f8cff" radius={[4,4,0,0]} /> {/* blue for before */}
+              <Bar dataKey="After" fill="#ffb347" radius={[4,4,0,0]} /> {/* orange-yellow for after */}
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -294,10 +294,10 @@ const Dashboard = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
               <XAxis dataKey="batch" stroke="#fff" />
               <YAxis stroke="#fff" />
-              <Tooltip contentStyle={{background:'#232323',color:'#fff',border:'1px solid #444'}}/>
+              <Tooltip contentStyle={{background:'#232323',color:'#fff',border:'1px solid #444'}} cursor={{ fill: 'rgba(87, 104, 139, 0.25)' }}/>
               <Legend wrapperStyle={{color:'#fff'}}/>
-              <Bar dataKey="Initial" fill="#4f8cff" /> {/* blue for initial */}
-              <Bar dataKey="Final" fill="#ffb347" /> {/* orange-yellow for final */}
+              <Bar dataKey="Initial" fill="#4f8cff" radius={[4,4,0,0]} /> {/* blue for initial */}
+              <Bar dataKey="Final" fill="#ffb347" radius={[4,4,0,0]} /> {/* orange-yellow for final */}
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -315,9 +315,9 @@ const Dashboard = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
               <XAxis dataKey="batch" stroke="#fff" />
               <YAxis stroke="#fff" />
-              <Tooltip contentStyle={{background:'#232323',color:'#fff',border:'1px solid #444'}}/>
+              <Tooltip contentStyle={{background:'#232323',color:'#fff',border:'1px solid #444'}} itemStyle={{color:'#ffd700'}} cursor={{ fill: 'rgba(87, 104, 139, 0.25)' }}/>
               <Legend wrapperStyle={{color:'#fff'}}/>
-              <Bar dataKey="ColorRemoval">
+              <Bar dataKey="ColorRemoval" radius={[4,4,0,0]}>
                 {colorRemovalChartData.map((entry, idx) => (
                   <Cell key={`removal-${idx}`} fill={['#00c6fb','#005bea','#43cea2','#ffb347','#7f53ac','#e040fb','#ffd700','#00c49a'][idx % 8]} />
                 ))}
@@ -352,3 +352,10 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+/* Add this CSS to your project (e.g., in App.css or Dashboard.css):
+.chart-hover-effect:hover {
+  background: linear-gradient(120deg, #232323 80%, #223a5f 100%);
+  box-shadow: 0 4px 32px rgba(34,58,95,0.18);
+}
+*/
