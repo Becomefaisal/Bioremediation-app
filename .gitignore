@@ -1,3 +1,6 @@
+# Ignore all .gitignore files in subfolders
+*.gitignore
+
 # Node.js
 node_modules/
 .env
