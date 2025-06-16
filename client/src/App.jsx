@@ -1,16 +1,26 @@
 import React from 'react';
-import FormPage from './components/FormPage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
+import FormPage from './components/FormPage';
+import ComparePage from './components/ComparePage';
+import TimelinePage from './components/TimelinePage';
+import BatchDetail from './components/BatchDetail';
 import './App.css';
 
 function App() {
   return (
-    <div>
-      <h1>Bioremediation Dashboard</h1>
-      <FormPage />
-      <hr />
-      <Dashboard />
-    </div>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/add" element={<FormPage />} />
+        <Route path="/compare" element={<ComparePage />} />
+        <Route path="/timeline" element={<TimelinePage />} />
+        <Route path="/batch/:batchId" element={<BatchDetail />} />
+        <Route path="*" element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
 }
 
