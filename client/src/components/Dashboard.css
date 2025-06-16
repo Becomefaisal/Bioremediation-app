@@ -1,0 +1,130 @@
+.dashboard-stats {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.dashboard-stat-card {
+  background: #18191c;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  padding: 1.2rem 2.2rem;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  margin-bottom: 1rem;
+  overflow: visible !important;
+  z-index: 2;
+}
+.dashboard-stat-card:hover {
+  box-shadow: 0 4px 24px rgba(34,58,95,0.18);
+  transform: translateY(-2px) scale(1.03);
+}
+.dashboard-stat-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.3rem;
+}
+.dashboard-stat-label {
+  color: #ffd700;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.2rem;
+}
+.dashboard-stat-value {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.dashboard-stat-desc {
+  color: #aaa;
+  font-size: 0.95rem;
+  margin-top: 0.2rem;
+  text-align: center;
+}
+
+.dashboard-filters {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+.dashboard-filters label {
+  color: #ffd700;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+.dashboard-filters select, .dashboard-filters input[type="date"] {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #232323;
+  color: #ffd700;
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+.dashboard-section {
+  margin-bottom: 2.5rem;
+  background: #232323;
+  border-radius: 12px;
+  padding: 2rem 2rem 1.5rem 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  color: #f2f2f2;
+  position: relative;
+}
+.dashboard-section-title {
+  color: #ffd700;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dashboard-section-info {
+  color: #aaa;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.dashboard-section-info .info-icon {
+  color: #ffd700;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* Ensure tooltips are always above other elements */
+.dashboard-stat-info .info-tooltip {
+  z-index: 99999 !important;
+}
+
+/* Also ensure parent containers allow overflow */
+.dashboard-section,
+.dashboard-stats,
+.dashboard-stat-card {
+  overflow: visible !important;
+}
+
+@media (max-width: 900px) {
+  .dashboard-stats {
+    flex-direction: column;
+    align-items: center;
+  }
+  .dashboard-filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .dashboard-section {
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+  }
+}

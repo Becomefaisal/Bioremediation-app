@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 import './ComparePage.css';
+import DashboardStatInfo from './DashboardStatInfo';
 
 const PARAMETER_OPTIONS = [
   { key: 'BOD', label: 'BOD' },
@@ -27,6 +28,7 @@ const ComparePage = () => {
   const [compareMethodB, setCompareMethodB] = useState('');
   const [compareResult, setCompareResult] = useState(null);
   const [compareLoading, setCompareLoading] = useState(false);
+  const [lastComparedParam, setLastComparedParam] = useState(null);
 
   useEffect(() => {
     axios.get('/api/samples/all')
@@ -43,6 +45,7 @@ const ComparePage = () => {
   const handleCompare = async () => {
     setCompareLoading(true);
     setCompareResult(null);
+    setLastComparedParam(compareParam); // Save the param at compare time
     try {
       const res = await axios.get('/api/samples/compare-methods', {
         params: {
@@ -140,7 +143,12 @@ const ComparePage = () => {
       </div>
       {/* Chart Panel below, wider */}
       <div className="compare-chart-panel" style={{margin: '0 auto 2.5rem auto', minWidth: 500, maxWidth: 800, width: '90%'}}>
-        <div style={{color:'#ffd700', fontWeight:700, fontSize:'1.15rem', marginBottom:12}}>Average Reduction (%)</div>
+        <div style={{color:'#ffd700', fontWeight:700, fontSize:'1.15rem', marginBottom:12, display:'flex', alignItems:'center', gap:8}}>
+          {(compareResult && !compareResult.error && lastComparedParam)
+            ? `${PARAMETER_OPTIONS.find(opt => opt.key === lastComparedParam)?.label || lastComparedParam} Reduction (%)`
+            : 'Reduction (%)'}
+          <DashboardStatInfo tooltip={`Bar chart comparing the reduction (%) for the selected parameter (${PARAMETER_OPTIONS.find(opt => opt.key === (lastComparedParam || compareParam))?.label || (lastComparedParam || compareParam)}) between the two chosen methods.`} />
+        </div>
         {compareResult && !compareResult.error ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={[

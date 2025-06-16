@@ -1,0 +1,64 @@
+.dashboard-stat-card {
+  /* ...existing styles... */
+  position: relative;
+}
+
+.dashboard-stat-info {
+  display: inline-block;
+  position: relative;
+  margin-left: 0.4rem;
+}
+
+.dashboard-stat-info .info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1em; /* Decreased from 1.5em */
+  height: 1.1em; /* Decreased from 1.5em */
+  border-radius: 50%;
+  background: none;
+  border: 2px solid #ffd700;
+  color: #ffd700;
+  font-size: 0.95em; /* Decreased from 1.1em */
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+}
+.dashboard-stat-info .info-icon:hover,
+.dashboard-stat-info .info-icon:focus {
+  background: #ffd700;
+  color: #18191c;
+}
+
+.dashboard-stat-info .info-tooltip {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 2.2em;
+  transform: translateX(-50%);
+  background: #232323;
+  color: #ffd700;
+  border: 1px solid #ffd700;
+  border-radius: 8px;
+  padding: 0.7em 1.2em;
+  font-size: 0.98em;
+  white-space: pre-line;
+  z-index: 9999; /* Increased for visibility */
+  min-width: 220px;
+  max-width: 320px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  pointer-events: auto;
+}
+
+.dashboard-stat-info:hover .info-tooltip,
+.dashboard-stat-info:focus-within .info-tooltip {
+  display: block;
+}
+
+/* Prevent cropping by ensuring parent containers allow overflow */
+.dashboard-stat-card,
+.dashboard-chart-section {
+  overflow: visible !important;
+  position: relative;
+}

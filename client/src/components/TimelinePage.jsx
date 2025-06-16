@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
+import DashboardStatInfo from './DashboardStatInfo'; // Adjust the import path as needed
 
 const PARAMETER_OPTIONS = [
   { key: 'BOD', label: 'BOD' },
@@ -110,12 +111,18 @@ const TimelinePage = () => {
         </select>
       </div>
       {/* Water Quality Heading */}
-      <h3 style={{color:'#43cea2', marginBottom: 16, fontSize: '1.2rem', borderBottom: '2px solid #43cea2', paddingBottom: 4}}>Water Quality Parameters</h3>
+      <h3 style={{color:'#43cea2', marginBottom: 16, fontSize: '1.2rem', borderBottom: '2px solid #43cea2', paddingBottom: 4}}>
+        Water Quality Parameters
+        <DashboardStatInfo tooltip="Timelines for each water quality parameter (BOD, COD, pH, etc.) after treatment. X-axis: date, Y-axis: value." />
+      </h3>
       {/* Water Quality Timelines - 2 per row */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32, marginBottom: 32 }}>
         {PARAMETER_OPTIONS.map((opt, idx) => (
           <div key={opt.key} style={{ flex: '1 1 400px', minWidth: 400, maxWidth: 600, background:'#232323', borderRadius:12, padding:24, marginBottom:32, boxShadow:'0 2px 12px rgba(0,0,0,0.2)', color:'#f2f2f2' }}>
-            <h3 style={{color:'#ffd700', fontSize:'1.1rem', marginBottom:8}}>{opt.label} Timeline</h3>
+            <h3 style={{color:'#ffd700', fontSize:'1.1rem', marginBottom:8}}>
+              {opt.label} Timeline
+              <DashboardStatInfo tooltip={`Line chart showing ${opt.label} values after treatment for each batch over time.`} />
+            </h3>
             {getTimelineData(opt.key).length === 0 ? (
               <p style={{color:'#aaa'}}>No timeline data for this parameter.</p>
             ) : (
@@ -136,12 +143,18 @@ const TimelinePage = () => {
       {/* Section Separator */}
       <hr style={{border:0, borderTop:'2px solid #444', margin:'48px 0 32px 0'}} />
       {/* Dye Parameters Timeline */}
-      <h3 style={{color:'#43cea2', marginBottom: 16, fontSize: '1.2rem', borderBottom: '2px solid #43cea2', paddingBottom: 4}}>Dye Parameters Timeline</h3>
+      <h3 style={{color:'#43cea2', marginBottom: 16, fontSize: '1.2rem', borderBottom: '2px solid #43cea2', paddingBottom: 4}}>
+        Dye Parameters Timeline
+        <DashboardStatInfo tooltip="Timelines for dye concentration and absorbance after treatment. Useful for tracking dye removal progress." />
+      </h3>
       {/* Dye Concentration and Absorbance Timelines Side by Side */}
       <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap', marginBottom: 32 }}>
         {/* Dye Concentration Timeline */}
         <div style={{ flex: '1 1 400px', minWidth: 400, maxWidth: 600, background:'#232323', borderRadius:12, padding:24, boxShadow:'0 2px 12px rgba(0,0,0,0.2)', color:'#f2f2f2' }}>
-          <h3 style={{color:'#43cea2', fontSize:'1.1rem', marginBottom:8}}>Dye Concentration Timeline</h3>
+          <h3 style={{color:'#43cea2', fontSize:'1.1rem', marginBottom:8}}>
+            Dye Concentration Timeline
+            <DashboardStatInfo tooltip="Line chart showing initial and final dye concentrations after treatment for each batch over time." />
+          </h3>
           {dyeConcentrationTimeline.length === 0 ? (
             <p style={{color:'#aaa'}}>No timeline data for dye concentration.</p>
           ) : (
@@ -160,7 +173,10 @@ const TimelinePage = () => {
         </div>
         {/* Dye Absorbance Timeline */}
         <div style={{ flex: '1 1 400px', minWidth: 400, maxWidth: 600, background:'#232323', borderRadius:12, padding:24, boxShadow:'0 2px 12px rgba(0,0,0,0.2)', color:'#f2f2f2' }}>
-          <h3 style={{color:'#43cea2', fontSize:'1.1rem', marginBottom:8}}>Dye Absorbance Timeline</h3>
+          <h3 style={{color:'#43cea2', fontSize:'1.1rem', marginBottom:8}}>
+            Dye Absorbance Timeline
+            <DashboardStatInfo tooltip="Line chart showing absorbance before and after treatment for each batch over time." />
+          </h3>
           {dyeAbsorbanceTimeline.length === 0 ? (
             <p style={{color:'#aaa'}}>No timeline data for dye absorbance.</p>
           ) : (
@@ -181,12 +197,18 @@ const TimelinePage = () => {
       {/* Section Separator */}
       <hr style={{border:0, borderTop:'2px solid #444', margin:'48px 0 32px 0'}} />
       {/* Heavy Metals Timeline */}
-      <h3 style={{color:'#43cea2', marginBottom: 16, fontSize: '1.2rem', borderBottom: '2px solid #43cea2', paddingBottom: 4}}>Heavy Metals Parameters Timeline</h3>
+      <h3 style={{color:'#43cea2', marginBottom: 16, fontSize: '1.2rem', borderBottom: '2px solid #43cea2', paddingBottom: 4}}>
+        Heavy Metals Parameters Timeline
+        <DashboardStatInfo tooltip="Timelines for heavy metals (e.g., Chromium, Lead) after treatment. Useful for monitoring metal removal." />
+      </h3>
       {/* Heavy Metals Timelines - 2 per row */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32, marginBottom: 32 }}>
         {HEAVY_METALS.map(metal => (
           <div key={metal.key} style={{ flex: '1 1 400px', minWidth: 400, maxWidth: 600, background:'#232323', borderRadius:12, padding:24, marginBottom:32, boxShadow:'0 2px 12px rgba(0,0,0,0.2)', color:'#f2f2f2' }}>
-            <h3 style={{color:'#ffd700', fontSize:'1.1rem', marginBottom:8}}>{metal.label} Timeline</h3>
+            <h3 style={{color:'#ffd700', fontSize:'1.1rem', marginBottom:8}}>
+              {metal.label} Timeline
+              <DashboardStatInfo tooltip={`Line chart showing ${metal.label} values after treatment for each batch over time.`} />
+            </h3>
             {getHeavyMetalTimeline(metal.key).length === 0 ? (
               <p style={{color:'#aaa'}}>No timeline data for this parameter.</p>
             ) : (

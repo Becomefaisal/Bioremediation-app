@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Legend, Cell } from 'recharts';
-import { LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Legend, Cell, PieChart, Pie, LineChart, Line } from 'recharts';
+import './Dashboard.css';
+import DashboardStatInfo from './DashboardStatInfo';
 
 const PARAMETER_OPTIONS = [
   { key: 'BOD', label: 'BOD' },
@@ -11,13 +12,13 @@ const PARAMETER_OPTIONS = [
   { key: 'DO', label: 'DO' },
   { key: 'temperature', label: 'Temperature' },
   { key: 'turbidity', label: 'Turbidity' },
-  // Add more as needed
 ];
 
 const Dashboard = () => {
   const [data, setData] = useState([]);
   const [selectedMethod, setSelectedMethod] = useState('');
   const [selectedParam, setSelectedParam] = useState('BOD');
+  const [dateRange, setDateRange] = useState({ from: '', to: '' });
 
   useEffect(() => {
     axios.get('/api/samples/all')
@@ -35,12 +36,23 @@ const Dashboard = () => {
 
   const safeData = Array.isArray(data) ? data : [];
 
+  // Filter by date range
+  const filteredData = safeData.filter(entry => {
+    if (!entry.sampleMeta?.timestamp) return true;
+    const ts = new Date(entry.sampleMeta.timestamp);
+    const from = dateRange.from ? new Date(dateRange.from) : null;
+    const to = dateRange.to ? new Date(dateRange.to) : null;
+    if (from && ts < from) return false;
+    if (to && ts > to) return false;
+    return true;
+  });
+
   // Extract unique method names
-  const methodNames = Array.from(new Set(safeData.map(entry => entry.method?.name).filter(Boolean)));
+  const methodNames = Array.from(new Set(filteredData.map(entry => entry.method?.name).filter(Boolean)));
 
   // Group by batchId and stage
   const batches = {};
-  safeData.forEach(entry => {
+  filteredData.forEach(entry => {
     if (!entry.method || !entry.sampleMeta) return;
     if (selectedMethod && entry.method.name !== selectedMethod) return;
     const batchId = entry.sampleMeta.batchId;
@@ -60,18 +72,6 @@ const Dashboard = () => {
     };
   }).filter(Boolean);
 
-  // Helper to extract number from MongoDB extended JSON
-  const extractNumber = v => {
-    if (typeof v === 'number') return v;
-    if (typeof v === 'string') return parseFloat(v);
-    if (v && typeof v === 'object') {
-      if ('$numberInt' in v) return parseInt(v['$numberInt'], 10);
-      if ('$numberDouble' in v) return parseFloat(v['$numberDouble']);
-      if ('$numberLong' in v) return parseInt(v['$numberLong'], 10);
-    }
-    return null;
-  };
-
   // Dye before/after chart by batch
   const dyeBeforeAfterChartData = Object.entries(batches).map(([batchId, stages]) => {
     const beforeDye = stages.before?.measurements?.dye;
@@ -88,7 +88,7 @@ const Dashboard = () => {
   const colorRemovalChartData = Object.entries(batches).map(([batchId, stages]) => {
     const beforeDye = stages.before?.measurements?.dye;
     const afterDye = stages.after?.measurements?.dye;
-    if (!beforeDye || !afterDye || !beforeDye.absorbanceInitial || !afterDye.absorbanceFinal) return null;
+    if (!beforeDye || !afterDye || beforeDye.absorbanceInitial == null || afterDye.absorbanceFinal == null) return null;
     const removal = beforeDye.absorbanceInitial !== 0
       ? ((beforeDye.absorbanceInitial - afterDye.absorbanceFinal) / beforeDye.absorbanceInitial) * 100
       : null;
@@ -98,46 +98,161 @@ const Dashboard = () => {
     };
   }).filter(d => d && d.ColorRemoval !== null);
 
+  // --- Executive Summary Stats ---
+  const totalBatches = Object.keys(batches).length;
+  const avgReduction = beforeAfterChartData.length > 0
+    ? (beforeAfterChartData.reduce((acc, d) => acc + ((d.Before && d.After) ? ((d.Before - d.After) / d.Before) * 100 : 0), 0) / beforeAfterChartData.length).toFixed(2)
+    : 'N/A';
+  const bestBatch = beforeAfterChartData.reduce((best, d) => {
+    if (!d.Before || !d.After) return best;
+    const reduction = ((d.Before - d.After) / d.Before) * 100;
+    if (!best || reduction > best.reduction) return { batch: d.batch, reduction };
+    return best;
+  }, null);
+
+  // --- Visual Diversity Example: Pie chart for batch distribution by method ---
+  const methodBatchCounts = methodNames.map(name => ({
+    name,
+    value: filteredData.filter(entry => entry.method?.name === name).length
+  }));
+
+  // --- Trends Example: Line chart for selected parameter over time ---
+  const timelineData = filteredData
+    .filter(entry => entry.measurements?.waterQuality?.[selectedParam] !== undefined)
+    .map(entry => ({
+      timestamp: entry.sampleMeta.timestamp,
+      value: entry.measurements.waterQuality[selectedParam],
+      batch: entry.sampleMeta.batchId
+    }))
+    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+  // --- User Guidance Tooltips ---
+  const statCardTooltips = [
+    'Total number of unique batches in the selected range.\nA batch is a unique experiment or sample set.',
+    'Average reduction (%) for the selected parameter across all batches.\nCalculation: ((Before - After) / Before) * 100, averaged over all batches.',
+    'Batch with the highest reduction for the selected parameter.\nCalculation: ((Before - After) / Before) * 100, highest among all batches.'
+  ];
+  const infoIcon = (content) => (
+    <span className="info-icon" tabIndex={0} title={content} style={{cursor:'pointer',marginLeft:4}}>&#9432;</span>
+  );
+
   return (
     <div style={{color:'#fff', padding: 32}}>
-      <h1 style={{color:'#ffd700', marginBottom: 32}}>Dashboard</h1>
-      {/* Method selection dropdown */}
-      <div style={{ marginBottom: 20 }}>
-        <label htmlFor="method-select" style={{ color: '#ffd700', fontWeight: 600, marginRight: 8 }}>Select Method: </label>
+      <h1 style={{color:'#ffd700', marginBottom: 32}}>Summary</h1>
+      {/* Interactive Filters - moved above cards */}
+      <div className="dashboard-filters" style={{marginBottom: '2.5rem'}}>
+        <label htmlFor="method-select">Method:</label>
         <select
           id="method-select"
           value={selectedMethod}
           onChange={e => setSelectedMethod(e.target.value)}
-          style={{ padding: '6px 16px', borderRadius: 6, border: '1px solid #444', background: '#232323', color: '#ffd700', fontWeight: 500 }}
         >
           <option value="">All Methods</option>
           {methodNames.map(name => (
             <option key={name} value={name}>{name}</option>
           ))}
         </select>
-      </div>
-      {/* Parameter selection dropdown */}
-      <div style={{ marginBottom: 32 }}>
-        <label htmlFor="param-select" style={{ color: '#ffd700', fontWeight: 600, marginRight: 8 }}>Compare Parameter: </label>
+        <label htmlFor="param-select">Parameter:</label>
         <select
           id="param-select"
           value={selectedParam}
           onChange={e => setSelectedParam(e.target.value)}
-          style={{ padding: '6px 16px', borderRadius: 6, border: '1px solid #444', background: '#232323', color: '#ffd700', fontWeight: 500 }}
         >
           {PARAMETER_OPTIONS.map(opt => (
             <option key={opt.key} value={opt.key}>{opt.label}</option>
           ))}
         </select>
+        <label>Date Range:</label>
+        <input type="date" value={dateRange.from} onChange={e => setDateRange(r => ({...r, from: e.target.value}))} />
+        <span style={{color:'#ffd700', fontWeight:600}}>-</span>
+        <input type="date" value={dateRange.to} onChange={e => setDateRange(r => ({...r, to: e.target.value}))} />
       </div>
-      {/* Dashboard Cards in 2-per-row flex layout */}
+      {/* Executive Summary / Key Stats */}
+      <div className="dashboard-stats">
+        <div className="dashboard-stat-card">
+          <span className="dashboard-stat-icon" role="img" aria-label="batches">📦</span>
+          <div className="dashboard-stat-label">Total Batches
+            <DashboardStatInfo tooltip={statCardTooltips[0]} />
+          </div>
+          <div className="dashboard-stat-value">{totalBatches}</div>
+        </div>
+        <div className="dashboard-stat-card">
+          <span className="dashboard-stat-icon" role="img" aria-label="reduction">📉</span>
+          <div className="dashboard-stat-label">Avg. {selectedParam} Reduction
+            <DashboardStatInfo tooltip={statCardTooltips[1]} />
+          </div>
+          <div className="dashboard-stat-value">{avgReduction}%</div>
+        </div>
+        <div className="dashboard-stat-card">
+          <span className="dashboard-stat-icon" role="img" aria-label="best">🏆</span>
+          <div className="dashboard-stat-label">Best Batch
+            <DashboardStatInfo tooltip={statCardTooltips[2]} />
+          </div>
+          <div className="dashboard-stat-value">{bestBatch ? bestBatch.batch : 'N/A'}</div>
+          <div className="dashboard-stat-desc">{bestBatch ? `${bestBatch.reduction.toFixed(2)}% reduction` : ''}</div>
+        </div>
+      </div>
+      {/* Visual Diversity: Pie chart for batch distribution by method */}
+      <div className="dashboard-section">
+        <div className="dashboard-section-title">
+          Batch Distribution by Method
+          <DashboardStatInfo tooltip="Pie chart showing the proportion of batches for each method. Hover on slices for details." />
+        </div>
+        <div className="dashboard-section-info">Shows the proportion of batches for each method. <span style={{color:'#ffd700'}}>Total: {filteredData.length}</span></div>
+        <ResponsiveContainer width="100%" height={340}>
+          <PieChart>
+            <Pie
+              data={methodBatchCounts}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={140}
+              label={({name, value}) => `${name}: ${value}`}
+            >
+              {methodBatchCounts.map((entry, idx) => (
+                <Cell
+                  key={`cell-${idx}`}
+                  fill={[
+                    '#ffd700', '#43cea2', '#4f8cff', '#ffb347',
+                    '#7f53ac', '#e040fb', '#00c49a', '#ff6384'
+                  ][idx % 8]}
+                />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+        <div style={{marginTop:8, color:'#aaa', textAlign:'center'}}>
+          {methodBatchCounts.map(m => <span key={m.name} style={{marginRight:16, color:'#ffd700'}}>{m.name}: {m.value}</span>)}
+        </div>
+      </div>
+      {/* Trends: Line chart for selected parameter over time */}
+      <div className="dashboard-section">
+        <div className="dashboard-section-title">
+          {selectedParam} Trend Over Time
+          <DashboardStatInfo tooltip={`Line chart showing how ${selectedParam} values change over time for all batches. X-axis: date, Y-axis: value.`} />
+        </div>
+        <div className="dashboard-section-info">Shows how {selectedParam} values change over time for all batches.</div>
+        <ResponsiveContainer width="100%" height={220}>
+          <LineChart data={timelineData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+            <XAxis dataKey="timestamp" tickFormatter={t => new Date(t).toLocaleDateString()} stroke="#fff" />
+            <YAxis stroke="#fff" />
+            <Tooltip labelFormatter={t => new Date(t).toLocaleString()} contentStyle={{background:'#232323',color:'#fff',border:'1px solid #444'}}/>
+            <Legend wrapperStyle={{color:'#fff'}}/>
+            <Line type="monotone" dataKey="value" name={selectedParam} stroke="#ffd700" />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      {/* Existing Dashboard Cards in 2-per-row flex layout */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32, marginBottom: 32 }}>
         {/* Before/After Comparison Chart */}
-        <div style={{ flex: '1 1 400px', minWidth: 400, maxWidth: 600, background: '#232323', borderRadius: 12, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.2)', color: '#f2f2f2', marginBottom: 32 }}>
-          <h2 style={{color:'#ffd700', fontSize:'1.1rem', marginBottom:8}}>Before/After Comparison ({selectedParam})</h2>
-          <div style={{fontSize:'1rem',color:'#aaa',marginBottom:8}}>
-            <b>Note:</b> Bars show before and after values for each batch. Reduction is calculated as a percentage for most parameters.
+        <div className="dashboard-section" style={{flex: '1 1 400px', minWidth: 400, maxWidth: 600}}>
+          <div className="dashboard-section-title">
+            Before/After Comparison ({selectedParam})
+            <DashboardStatInfo tooltip={`Bar chart showing before and after values for each batch for ${selectedParam}. Useful for visualizing reduction.`} />
           </div>
+          <div className="dashboard-section-info">Bars show before and after values for each batch. Reduction is calculated as a percentage for most parameters.</div>
           {beforeAfterChartData.length === 0 ? (
             <p style={{color:'#aaa'}}>No data available for this method/parameter.</p>
           ) : (
@@ -155,11 +270,12 @@ const Dashboard = () => {
           )}
         </div>
         {/* Dye Concentration (Before/After by Batch) */}
-        <div style={{ flex: '1 1 400px', minWidth: 400, maxWidth: 600, background: '#232323', borderRadius: 12, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.2)', color: '#f2f2f2', marginBottom: 32 }}>
-          <h2 style={{color:'#ffd700', fontSize:'1.1rem', marginBottom:8}}>Dye Concentration (Before/After by Batch)</h2>
-          <div style={{fontSize:'1rem',color:'#aaa',marginBottom:8}}>
-            <b>Note:</b> Bars show initial and final dye concentrations for each batch.
+        <div className="dashboard-section" style={{flex: '1 1 400px', minWidth: 400, maxWidth: 600}}>
+          <div className="dashboard-section-title">
+            Dye Concentration (Before/After by Batch)
+            <DashboardStatInfo tooltip="Bar chart showing initial and final dye concentrations for each batch. Useful for tracking dye removal." />
           </div>
+          <div className="dashboard-section-info">Bars show initial and final dye concentrations for each batch.</div>
           {dyeBeforeAfterChartData.length === 0 ? (
             <p style={{color:'#aaa'}}>No dye concentration data available.</p>
           ) : (
@@ -177,11 +293,12 @@ const Dashboard = () => {
           )}
         </div>
         {/* Color Removal Efficiency (by Batch) */}
-        <div style={{ flex: '1 1 400px', minWidth: 400, maxWidth: 600, background: '#232323', borderRadius: 12, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.2)', color: '#f2f2f2', marginBottom: 32 }}>
-          <h2 style={{color:'#ffd700', fontSize:'1.1rem', marginBottom:8}}>Color Removal Efficiency (by Batch)</h2>
-          <div style={{fontSize:'1rem',color:'#aaa',marginBottom:8}}>
-            <b>Note:</b> Bars show color removal efficiency (%) for each batch, calculated from absorbance values.
+        <div className="dashboard-section" style={{flex: '1 1 400px', minWidth: 400, maxWidth: 600}}>
+          <div className="dashboard-section-title">
+            Color Removal Efficiency (by Batch)
+            <DashboardStatInfo tooltip="Bar chart showing color removal efficiency (%) for each batch, calculated from absorbance values." />
           </div>
+          <div className="dashboard-section-info">Bars show color removal efficiency (%) for each batch, calculated from absorbance values.</div>
           {colorRemovalChartData.length === 0 ? (
             <p style={{color:'#aaa'}}>No color removal data available.</p>
           ) : (
@@ -190,7 +307,7 @@ const Dashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                 <XAxis dataKey="batch" stroke="#fff" />
                 <YAxis stroke="#fff" />
-                <Tooltip contentStyle={{background:'#232323',color:'#fff',border:'1px solid #444'}} itemStyle={{color:'#ffd700'}} cursor={{ fill: 'rgba(87, 104, 139, 0.25)' }}/>
+                <Tooltip contentStyle={{background:'#232323',color:'#fff',border:'1px solid #444'}} itemStyle={{color:'#ffd700'}} cursor={{ fill: 'rgba(87, 104, 139, 0.25)' }} />
                 <Legend wrapperStyle={{color:'#fff'}}/>
                 <Bar dataKey="ColorRemoval" radius={[4,4,0,0]}>
                   {colorRemovalChartData.map((entry, idx) => (
@@ -207,10 +324,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-/* Add this CSS to your project (e.g., in App.css or Dashboard.css):
-.chart-hover-effect:hover {
-  background: linear-gradient(120deg, #232323 80%, #223a5f 100%);
-  box-shadow: 0 4px 32px rgba(34,58,95,0.18);
-}
-*/
