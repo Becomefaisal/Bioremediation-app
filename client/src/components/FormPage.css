@@ -1,0 +1,149 @@
+/* Modern two-column scientific form layout */
+.form-root {
+  max-width: 1400px; /* even wider for more space */
+  margin: 2.5rem auto;
+  background: #191a1d;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  padding: 2.5rem 2rem 2rem 2rem;
+  color: #fff;
+}
+.wider-form {
+  max-width: 1400px;
+}
+.form-title {
+  text-align: center;
+  font-size: 2.3rem;
+  font-weight: 700;
+  margin-bottom: 2.2rem;
+  color: #ffd700;
+}
+.form-section {
+  background: #232323;
+  border-radius: 12px;
+  margin-bottom: 2.2rem;
+  padding: 2.2rem 2.2rem 1.7rem 2.2rem; /* more padding for content */
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+}
+.form-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.1rem;
+  color: #ffd700;
+}
+.form-section-desc {
+  font-size: 1rem;
+  color: #aaa;
+  margin-bottom: 1.2rem;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem 2.2rem;
+  align-items: flex-start;
+}
+.form-grid > div {
+  position: relative;
+  min-width: 0;
+}
+.form-row {
+  display: flex;
+  gap: 3.5rem; /* wider gap for two cards */
+  margin-bottom: 1.1rem;
+}
+.form-label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  color: #ffd700;
+  white-space: nowrap;
+}
+.form-input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.6rem 0.9rem;
+  border-radius: 7px;
+  border: 1.5px solid #444;
+  background: #18191c;
+  color: #fff;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+.form-input:focus {
+  border: 1.5px solid #ffd700;
+  outline: none;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+.form-btn {
+  background: #ffd700;
+  color: #18191c;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 7px;
+  padding: 0.7rem 2.2rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.form-btn:hover {
+  background: #fff;
+  color: #18191c;
+}
+.suggestion-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #232323;
+  border: 1px solid #ffd700;
+  border-radius: 0 0 8px 8px;
+  z-index: 20;
+  max-height: 180px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
+.suggestion-item {
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  color: #ffd700;
+  font-size: 1rem;
+  border-bottom: 1px solid #333;
+  transition: background 0.15s;
+  background: #232323;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+.suggestion-item:hover {
+  background: #333;
+}
+@media (max-width: 1200px) {
+  .form-root, .wider-form {
+    max-width: 98vw;
+    padding: 1rem;
+  }
+  .form-section {
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+  }
+  .form-row {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}

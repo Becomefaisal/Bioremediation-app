@@ -5,6 +5,7 @@ const SampleEntry = require('../models/SampleEntry');
 // New POST route for combined before/after entry
 router.post('/add', async (req, res) => {
   try {
+    console.log('Received body:', JSON.stringify(req.body, null, 2)); // Debug log
     const { location, method, sampleMeta, beforeMeasurements, afterMeasurements, note } = req.body;
     if (!location || !method || !sampleMeta || !beforeMeasurements || !afterMeasurements) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -119,6 +120,17 @@ router.get('/timeline/:method/:param', async (req, res) => {
     res.json(timeline);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching timeline' });
+  }
+});
+
+// Get all unique treatment method names
+router.get('/method-names', async (req, res) => {
+  try {
+    const methods = await SampleEntry.distinct('method.name');
+    res.json(methods);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to fetch method names' });
   }
 });
 
