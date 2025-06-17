@@ -10,6 +10,8 @@ const Navbar = () => (
       <NavLink to="/add" className={({isActive}) => isActive ? 'active' : ''}>Add New Data</NavLink>
       <NavLink to="/compare" className={({isActive}) => isActive ? 'active' : ''}>Compare Methods</NavLink>
       <NavLink to="/timeline" className={({isActive}) => isActive ? 'active' : ''}>Timeline</NavLink>
+      <NavLink to="/analysis" className={({isActive}) => isActive ? 'active' : ''}>Analysis</NavLink>
+      <NavLink to="/prediction" className={({isActive}) => isActive ? 'active' : ''}>AI Prediction</NavLink>
     </div>
   </nav>
 );

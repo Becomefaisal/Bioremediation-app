@@ -6,6 +6,8 @@ import FormPage from './components/FormPage';
 import ComparePage from './components/ComparePage';
 import TimelinePage from './components/TimelinePage';
 import BatchDetail from './components/BatchDetail';
+import AnalysisPage from './components/AnalysisPage';
+import PredictionForm from './components/PredictionForm';
 import './App.css';
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
         <Route path="/compare" element={<ComparePage />} />
         <Route path="/timeline" element={<TimelinePage />} />
         <Route path="/batch/:batchId" element={<BatchDetail />} />
+        <Route path="/analysis" element={<AnalysisPage />} />
+        <Route path="/prediction" element={<PredictionForm />} />
         <Route path="*" element={<Dashboard />} />
       </Routes>
     </Router>

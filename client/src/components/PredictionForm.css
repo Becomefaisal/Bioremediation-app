@@ -1,0 +1,171 @@
+:root {
+  --form-bg-light: #fafbfc;
+  --form-bg-dark: #23272f;
+  --form-border-light: #ddd;
+  --form-border-dark: #333a44;
+  --form-shadow: 0 2px 16px rgba(0,0,0,0.12);
+  --form-title-light: #222;
+  --form-title-dark: #f3f3f3;
+  --input-bg-light: #f4f6f8;
+  --input-bg-dark: #181b20;
+  --input-border-light: #bbb;
+  --input-border-dark: #444a55;
+  --input-text-light: #222;
+  --input-text-dark: #f3f3f3;
+  --button-bg: #007bff;
+  --button-bg-disabled: #b3d1ff;
+  --button-text: #fff;
+  --result-bg-light: #e6f7e6;
+  --result-bg-dark: #1e2b1e;
+  --result-border-light: #b2e6b2;
+  --result-border-dark: #2e4d2e;
+  --result-text-light: #1a4d1a;
+  --result-text-dark: #b6fcb6;
+  --error: #d32f2f;
+  --status: #007bff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --form-bg: rgba(28, 32, 38, 0.92); /* darker, glassy */
+    --form-border: #23272f;
+    --form-title: #f3f3f3;
+    --input-bg: #181b20;
+    --input-border: #444a55;
+    --input-text: #f3f3f3;
+    --result-bg: #232f23;
+    --result-border: #3a5c3a;
+    --result-text: #b6fcb6;
+  }
+}
+:root {
+  --form-bg: var(--form-bg-light);
+  --form-border: var(--form-border-light);
+  --form-title: var(--form-title-light);
+  --input-bg: var(--input-bg-light);
+  --input-border: var(--input-border-light);
+  --input-text: var(--input-text-light);
+  --result-bg: var(--result-bg-light);
+  --result-border: var(--result-border-light);
+  --result-text: var(--result-text-light);
+}
+
+.prediction-form-container {
+  max-width: 1700px;
+  margin: 3rem auto;
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  border: 1px solid #23272f;
+  border-radius: 22px;
+  background: #232734;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: background 0.3s, border 0.3s;
+}
+.prediction-form-container.wide,
+.prediction-form-container.extra-wide {
+  max-width: 1700px;
+}
+.prediction-form-container h2 {
+  margin-bottom: 2.2rem;
+  font-size: 2.5rem;
+  color: #fff;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.prediction-form-container form {
+  width: 100%;
+}
+.form-row {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.form-row label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: #e0e6f0;
+  margin-bottom: 0.5rem;
+  font-size: 1.13rem;
+  letter-spacing: 0.01em;
+}
+.full-width {
+  width: 100%;
+}
+.prediction-form-container input,
+.prediction-form-container textarea,
+.prediction-form-container select {
+  margin-top: 0.5rem;
+  padding: 0.8rem 1.1rem;
+  border: 1px solid #444a55;
+  border-radius: 9px;
+  font-size: 1.13rem;
+  background: #181b20;
+  color: #f3f3f3;
+  transition: background 0.3s, border 0.3s, color 0.3s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+.prediction-form-container input:focus,
+.prediction-form-container textarea:focus,
+.prediction-form-container select:focus {
+  outline: 2px solid #007bff;
+  border-color: #007bff;
+}
+.prediction-form-container textarea {
+  resize: vertical;
+}
+.prediction-form-container button {
+  margin-top: 1.5rem;
+  padding: 0.9rem 2.7rem;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 1.18rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+.prediction-form-container button:disabled {
+  background: #b3d1ff;
+  cursor: not-allowed;
+}
+.prediction-form-container .error {
+  color: var(--error);
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+.prediction-result {
+  margin-top: 2rem;
+  background: #1e2b1e;
+  border: 1px solid #3a5c3a;
+  border-radius: 10px;
+  padding: 1.3rem 1.7rem;
+  color: #b6fcb6;
+  font-size: 1.22rem;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  transition: background 0.3s, border 0.3s, color 0.3s;
+}
+.typewriter-effect {
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  white-space: pre-line;
+  min-height: 2.5em;
+  font-size: 1.13rem;
+  letter-spacing: 0.01em;
+}
+.status-info {
+  color: var(--status);
+  font-size: 1.13rem;
+  margin-top: 1.2rem;
+  text-align: center;
+  font-weight: 500;
+}

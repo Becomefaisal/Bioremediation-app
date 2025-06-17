@@ -1,0 +1,29 @@
+.matrix-table-container {
+  overflow-x: auto;
+  margin: 0.5rem 0 1.5rem 0;
+  display: flex;
+  justify-content: center;
+}
+.matrix-table {
+  border-collapse: collapse;
+  min-width: 600px;
+  background: #232323;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px #000a;
+}
+.matrix-table th, .matrix-table td {
+  border: 1px solid #ffd700;
+  padding: 0.7rem 1.2rem;
+  text-align: center;
+  font-size: 1.1rem;
+  min-width: 60px;
+}
+.matrix-table th {
+  background: #181818;
+  color: #ffd700;
+  font-weight: 600;
+}
+.matrix-table td {
+  transition: background 0.2s;
+}
