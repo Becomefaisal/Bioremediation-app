@@ -5,10 +5,17 @@ require('dotenv').config();
 
 const app = express();
 app.use(cors({
-  origin: [
-    'https://bioremediation-flu8kxc2m-becomefaisals-projects.vercel.app',
-    'https://bioremediation.vercel.app'
-  ],
+  origin: function(origin, callback) {
+    // Allow all Vercel preview/production domains and localhost
+    if (!origin ||
+        origin.endsWith('.vercel.app') ||
+        origin === 'https://bioremediation.vercel.app' ||
+        origin.startsWith('http://localhost')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
