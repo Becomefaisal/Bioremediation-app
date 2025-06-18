@@ -30,8 +30,10 @@ const ComparePage = () => {
   const [compareLoading, setCompareLoading] = useState(false);
   const [lastComparedParam, setLastComparedParam] = useState(null);
 
+  const apiUrl = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
-    axios.get('/api/samples/all')
+    axios.get(`${apiUrl}/api/samples/all`)
       .then(res => {
         if (Array.isArray(res.data)) setData(res.data);
         else if (res.data && typeof res.data === 'object') setData([res.data]);
@@ -47,7 +49,7 @@ const ComparePage = () => {
     setCompareResult(null);
     setLastComparedParam(compareParam); // Save the param at compare time
     try {
-      const res = await axios.get('/api/samples/compare-methods', {
+      const res = await axios.get(`${apiUrl}/api/samples/compare-methods`, {
         params: {
           param: compareParam,
           methodA: compareMethodA,

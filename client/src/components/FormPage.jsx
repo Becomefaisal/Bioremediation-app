@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './FormPage.css';
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const FormPage = () => {
   const [formData, setFormData] = useState({
     location: '',
@@ -28,7 +30,7 @@ const FormPage = () => {
   useEffect(() => {
     async function fetchMethods() {
       try {
-        const res = await axios.get('/api/samples/method-names');
+        const res = await axios.get(`${apiUrl}/api/samples/method-names`);
         const unique = Array.isArray(res.data) ? res.data.filter(Boolean) : [];
         setMethodSuggestions(unique);
         setFilteredSuggestions(unique);

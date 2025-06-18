@@ -21,12 +21,14 @@ const HEAVY_METALS = [
   { key: 'Ammonia', label: 'Ammonia' },
 ];
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const TimelinePage = () => {
   const [data, setData] = useState([]);
   const [selectedMethod, setSelectedMethod] = useState('');
 
   useEffect(() => {
-    axios.get('/api/samples/all')
+    axios.get(`${apiUrl}/api/samples/all`)
       .then(res => {
         if (Array.isArray(res.data)) setData(res.data);
         else if (res.data && typeof res.data === 'object') setData([res.data]);

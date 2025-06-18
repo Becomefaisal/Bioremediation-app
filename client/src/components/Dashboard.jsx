@@ -15,13 +15,14 @@ const PARAMETER_OPTIONS = [
 ];
 
 const Dashboard = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [data, setData] = useState([]);
   const [selectedMethod, setSelectedMethod] = useState('');
   const [selectedParam, setSelectedParam] = useState('BOD');
   const [dateRange, setDateRange] = useState({ from: '', to: '' });
 
   useEffect(() => {
-    axios.get('/api/samples/all')
+    axios.get(`${apiUrl}/api/samples/all`)
       .then(res => {
         if (Array.isArray(res.data)) {
           setData(res.data);
@@ -135,6 +136,22 @@ const Dashboard = () => {
   const infoIcon = (content) => (
     <span className="info-icon" tabIndex={0} title={content} style={{cursor:'pointer',marginLeft:4}}>&#9432;</span>
   );
+
+  // Defensive fix for NaN/undefined values in chart data
+  const safeBeforeAfterChartData = beforeAfterChartData.map(d => ({
+    ...d,
+    Before: isNaN(d.Before) || d.Before == null ? 0 : d.Before,
+    After: isNaN(d.After) || d.After == null ? 0 : d.After
+  }));
+  const safeDyeBeforeAfterChartData = dyeBeforeAfterChartData.map(d => ({
+    ...d,
+    Initial: isNaN(d.Initial) || d.Initial == null ? 0 : d.Initial,
+    Final: isNaN(d.Final) || d.Final == null ? 0 : d.Final
+  }));
+  const safeColorRemovalChartData = colorRemovalChartData.map(d => ({
+    ...d,
+    ColorRemoval: isNaN(d.ColorRemoval) || d.ColorRemoval == null ? 0 : d.ColorRemoval
+  }));
 
   return (
     <div style={{color:'#fff', padding: 32}}>
@@ -253,11 +270,11 @@ const Dashboard = () => {
             <DashboardStatInfo tooltip={`Bar chart showing before and after values for each batch for ${selectedParam}. Useful for visualizing reduction.`} />
           </div>
           <div className="dashboard-section-info">Bars show before and after values for each batch. Reduction is calculated as a percentage for most parameters.</div>
-          {beforeAfterChartData.length === 0 ? (
+          {safeBeforeAfterChartData.length === 0 ? (
             <p style={{color:'#aaa'}}>No data available for this method/parameter.</p>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={beforeAfterChartData}>
+              <BarChart data={safeBeforeAfterChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                 <XAxis dataKey="batch" stroke="#fff" />
                 <YAxis stroke="#fff" />
@@ -276,11 +293,11 @@ const Dashboard = () => {
             <DashboardStatInfo tooltip="Bar chart showing initial and final dye concentrations for each batch. Useful for tracking dye removal." />
           </div>
           <div className="dashboard-section-info">Bars show initial and final dye concentrations for each batch.</div>
-          {dyeBeforeAfterChartData.length === 0 ? (
+          {safeDyeBeforeAfterChartData.length === 0 ? (
             <p style={{color:'#aaa'}}>No dye concentration data available.</p>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={dyeBeforeAfterChartData}>
+              <BarChart data={safeDyeBeforeAfterChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                 <XAxis dataKey="batch" stroke="#fff" />
                 <YAxis stroke="#fff" />
@@ -299,18 +316,18 @@ const Dashboard = () => {
             <DashboardStatInfo tooltip="Bar chart showing color removal efficiency (%) for each batch, calculated from absorbance values." />
           </div>
           <div className="dashboard-section-info">Bars show color removal efficiency (%) for each batch, calculated from absorbance values.</div>
-          {colorRemovalChartData.length === 0 ? (
+          {safeColorRemovalChartData.length === 0 ? (
             <p style={{color:'#aaa'}}>No color removal data available.</p>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={colorRemovalChartData}>
+              <BarChart data={safeColorRemovalChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                 <XAxis dataKey="batch" stroke="#fff" />
                 <YAxis stroke="#fff" />
                 <Tooltip contentStyle={{background:'#232323',color:'#fff',border:'1px solid #444'}} itemStyle={{color:'#ffd700'}} cursor={{ fill: 'rgba(87, 104, 139, 0.25)' }} />
                 <Legend wrapperStyle={{color:'#fff'}}/>
                 <Bar dataKey="ColorRemoval" radius={[4,4,0,0]}>
-                  {colorRemovalChartData.map((entry, idx) => (
+                  {safeColorRemovalChartData.map((entry, idx) => (
                     <Cell key={`removal-${idx}`} fill={['#00c6fb','#005bea','#43cea2','#ffb347','#7f53ac','#e040fb','#ffd700','#00c49a'][idx % 8]} />
                   ))}
                 </Bar>

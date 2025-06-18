@@ -1,1 +1,19 @@
-node_modules
+node_modules/
+.env
+# Ignore build output
+client/dist/
+client/build/
+server/node_modules/
+client/node_modules/
+# Ignore OS files
+.DS_Store
+Thumbs.db
+# Ignore logs
+*.log
+# Ignore IDE/editor files
+.vscode/
+.idea/
+# Ignore test and generated data
+server/sample_data.generated.json
+server/test.js
+client/src/components/debug_regression_matrix.js

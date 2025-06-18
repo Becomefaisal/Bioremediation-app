@@ -114,17 +114,3 @@
 .dashboard-stat-card {
   overflow: visible !important;
 }
-
-@media (max-width: 900px) {
-  .dashboard-stats {
-    flex-direction: column;
-    align-items: center;
-  }
-  .dashboard-filters {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .dashboard-section {
-    padding: 1.2rem 0.5rem 1rem 0.5rem;
-  }
-}

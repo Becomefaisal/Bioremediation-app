@@ -66,8 +66,10 @@ const AnalysisPage = () => {
   const [regression, setRegression] = useState(null);
   const [correlationError, setCorrelationError] = useState('');
 
+  const apiUrl = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
-    axios.get('/api/samples/all').then(res => setData(res.data || []));
+    axios.get(`${apiUrl}/api/samples/all`).then(res => setData(res.data || []));
   }, []);
 
   const batches = useMemo(() => groupByBatch(data), [data]);

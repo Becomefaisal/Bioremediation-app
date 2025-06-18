@@ -17,9 +17,10 @@ const BatchDetail = () => {
   const { batchId } = useParams();
   const [data, setData] = useState([]);
   const [selectedParam, setSelectedParam] = useState('BOD');
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    axios.get('/api/samples/all')
+    axios.get(`${apiUrl}/api/samples/all`)
       .then(res => {
         if (Array.isArray(res.data)) setData(res.data);
         else if (res.data && typeof res.data === 'object') setData([res.data]);
