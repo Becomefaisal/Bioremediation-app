@@ -40,15 +40,16 @@ router.post('/', async (req, res) => {
     try {
         const aiResult = await queryOpenRouter(input);
         let cleaned = aiResult
-            .replace(/([<◁][t]?hink[▷>][\s\S]*?[<◁]\/?[t]?hink[▷>])/gi, '')
-            .replace(/undefined\s*$/gi, '')
+            .replace(/([<◁][t]?hink[▷>][\s\S]*?[<◁]\/?.*?[▷>])/gi, '')
+            .replace(/^(te|Te)\b[ ]*/i, 'The ')
             .replace(/undefined/gi, '')
             .split('\n')
             .map(line => line.trim())
             .filter(line => line.length > 0)
             .join(' ')
             .trim();
-        cleaned = cleaned.replace(/^(Te |te )/, 'The ');
+        // Remove any trailing undefined or te left after join/trim
+        cleaned = cleaned.replace(/^(te|Te)\b[ ]*/i, 'The ').replace(/undefined$/gi, '').trim();
         // If the cleaned result is empty or default, return a more user-friendly message
         if (!cleaned || cleaned === 'No prediction returned.') {
             cleaned = 'No prediction could be generated for the provided input.';
