@@ -1,8 +1,8 @@
 const axios = require('axios');
-require('dotenv');
+require('dotenv').config();
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-console.log('OPENROUTER_API_KEY:', OPENROUTER_API_KEY ? 'Loaded' : 'NOT LOADED');
+console.log('OPENROUTER_API_KEY loaded:', !!OPENROUTER_API_KEY);
 async function queryOpenRouter(input) {
     const prompt = `You are an expert in bioremediation. Given the following scenario, provide ONLY the most likely final outcome (in 4-5 sentences ) of the bioremediation process, based on the parameters. Do NOT include your reasoning, thinking, or bullet points. Be concise and direct.\n\nScenario Details:\n- Pollutant Type: ${input.pollutantType}\n- Concentration: ${input.concentration} mg/L\n- Temperature: ${input.temperature} °C\n- pH: ${input.ph}\n- Remediation Method: ${input.remediationMethod}\n- Duration: ${input.duration} days\n- Microbes: ${input.microbes}\n- Site Description: ${input.siteDescription}\n\nFinal Likely Outcome:`;
     const response = await axios.post(
