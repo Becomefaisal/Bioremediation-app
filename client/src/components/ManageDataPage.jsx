@@ -12,9 +12,9 @@ function ManageDataPage() {
   const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/samples`)
+    fetch(`${API_BASE}/api/samples/all`)
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch');
+        if (!res.ok) throw new Error('Failed to fetch: ' + res.status);
         return res.json();
       })
       .then(setData)
