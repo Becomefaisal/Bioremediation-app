@@ -21,6 +21,7 @@ const Navbar = () => {
         <NavLink to="/timeline" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Timeline</NavLink>
         <NavLink to="/analysis" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Analysis</NavLink>
         <NavLink to="/prediction" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>AI Prediction</NavLink>
+        <NavLink to="/manage" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Manage Data</NavLink>
       </div>
     </nav>
   );

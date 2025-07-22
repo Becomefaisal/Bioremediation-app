@@ -1,57 +1,91 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import './AnalysisPage.css'; // Reuse design styles
 
 function ManageDataPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
+  const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
     fetch('/api/samples')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
       .then(setData)
-      .catch(setError)
+      .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this entry?')) return;
+    setDeleting(id);
     try {
-      await fetch(`/api/samples/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/samples/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Delete failed');
       setData(data.filter(item => item._id !== id));
     } catch (err) {
-      alert('Delete failed');
+      alert('Delete failed: ' + err.message);
+    } finally {
+      setDeleting(null);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading data.</div>;
+  const filteredData = data.filter(item =>
+    item.name?.toLowerCase().includes(search.toLowerCase()) ||
+    item._id?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (loading) return <div className="loading">Loading...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
-    <div>
+    <div className="analysis-page">
       <h2>Manage Existing Data</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map(item => (
-            <tr key={item._id}>
-              <td>{item._id}</td>
-              <td>{item.name}</td>
-              <td>
-                <Link to={`/edit/${item._id}`}>Edit</Link>
-                {' | '}
-                <button onClick={() => handleDelete(item._id)}>Delete</button>
-              </td>
+      <input
+        type="text"
+        placeholder="Search by name or ID..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className="search-input"
+        aria-label="Search data"
+      />
+      <div className="table-container">
+        <table className="matrix-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredData.length === 0 ? (
+              <tr><td colSpan={3}>No data found.</td></tr>
+            ) : (
+              filteredData.map(item => (
+                <tr key={item._id}>
+                  <td>{item._id}</td>
+                  <td>{item.name ? String(item.name).replace(/</g, '&lt;').replace(/>/g, '&gt;') : '-'}</td>
+                  <td>
+                    <Link to={`/edit/${item._id}`} className="edit-link">Edit</Link>
+                    {' | '}
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDelete(item._id)}
+                      disabled={deleting === item._id}
+                      aria-label={`Delete entry ${item._id}`}
+                    >{deleting === item._id ? 'Deleting...' : 'Delete'}</button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import './AnalysisPage.css';
 
 function EditDataPage() {
   const { id } = useParams();
@@ -11,9 +12,12 @@ function EditDataPage() {
 
   useEffect(() => {
     fetch(`/api/samples/${id}`)
-      .then(res => res.json())
-      .then(data => setForm({ name: data.name }))
-      .catch(setError)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
+      .then(data => setForm({ name: data.name || '' }))
+      .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -23,6 +27,10 @@ function EditDataPage() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    if (!form.name.trim()) {
+      setError('Name is required');
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
@@ -34,24 +42,32 @@ function EditDataPage() {
       if (!res.ok) throw new Error('Failed to update');
       navigate('/manage');
     } catch (err) {
-      setError('Update failed');
+      setError('Update failed: ' + err.message);
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="loading">Loading...</div>;
   return (
-    <div>
+    <div className="analysis-page">
       <h2>Edit Data Entry</h2>
-      {error && <div style={{color:'red'}}>{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <label>
-          Name:
-          <input name="name" value={form.name} onChange={handleChange} required />
-        </label>
-        <button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
-        <button type="button" onClick={() => navigate('/manage')}>Cancel</button>
+      {error && <div className="error">{error}</div>}
+      <form onSubmit={handleSubmit} className="edit-form">
+        <label htmlFor="name">Name:</label>
+        <input
+          id="name"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          required
+          className="search-input"
+          aria-label="Name"
+        />
+        <div className="form-actions">
+          <button type="submit" disabled={saving} className="edit-link">{saving ? 'Saving...' : 'Save'}</button>
+          <button type="button" onClick={() => navigate('/manage')} className="delete-btn">Cancel</button>
+        </div>
       </form>
     </div>
   );
