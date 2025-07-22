@@ -38,7 +38,8 @@ function ManageDataPage() {
 
   const filteredData = data.filter(item =>
     item.name?.toLowerCase().includes(search.toLowerCase()) ||
-    item._id?.toLowerCase().includes(search.toLowerCase())
+    item._id?.toLowerCase().includes(search.toLowerCase()) ||
+    item.method?.name?.toLowerCase().includes(search.toLowerCase())
   );
 
   if (loading) return <div className="loading">Loading...</div>;
@@ -49,7 +50,7 @@ function ManageDataPage() {
       <h2>Manage Existing Data</h2>
       <input
         type="text"
-        placeholder="Search by name or ID..."
+        placeholder="Search by name, ID, or method..."
         value={search}
         onChange={e => setSearch(e.target.value)}
         className="search-input"
@@ -61,17 +62,21 @@ function ManageDataPage() {
             <tr>
               <th>ID</th>
               <th>Name</th>
+              <th>Method</th>
+              <th>Timestamp</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredData.length === 0 ? (
-              <tr><td colSpan={3}>No data found.</td></tr>
+              <tr><td colSpan={5}>No data found.</td></tr>
             ) : (
               filteredData.map(item => (
                 <tr key={item._id}>
                   <td>{item._id}</td>
                   <td>{item.name ? String(item.name).replace(/</g, '&lt;').replace(/>/g, '&gt;') : '-'}</td>
+                  <td>{item.method?.name || '-'}</td>
+                  <td>{item.sampleMeta?.timestamp ? new Date(item.sampleMeta.timestamp).toLocaleString() : '-'}</td>
                   <td>
                     <Link to={`/edit/${item._id}`} className="edit-link">Edit</Link>
                     {' | '}

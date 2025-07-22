@@ -103,12 +103,17 @@
 }
 .matrix-table th, .matrix-table td {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #eee;
+  border: 1px solid #ffd600;
   text-align: left;
 }
 .matrix-table th {
+  color: #ffd600;
   background: #f7f7f7;
   font-weight: 600;
+}
+.matrix-table td {
+  background: #222;
+  color: #fff;
 }
 .edit-link {
   color: #1976d2;
@@ -169,4 +174,13 @@
 .form-actions {
   display: flex;
   gap: 1rem;
+}
+.edit-card {
+  background: #222;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 500px;
+  border: 2px solid #ffd600;
 }
