@@ -37,7 +37,6 @@ function ManageDataPage() {
   };
 
   const filteredData = data.filter(item =>
-    item.name?.toLowerCase().includes(search.toLowerCase()) ||
     item._id?.toLowerCase().includes(search.toLowerCase()) ||
     item.method?.name?.toLowerCase().includes(search.toLowerCase())
   );
@@ -48,20 +47,27 @@ function ManageDataPage() {
   return (
     <div className="analysis-page">
       <h2>Manage Existing Data</h2>
-      <input
-        type="text"
-        placeholder="Search by name, ID, or method..."
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        className="search-input"
-        aria-label="Search data"
-      />
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
+        <input
+          type="text"
+          placeholder="Search by ID, method..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="search-input"
+          aria-label="Search data"
+          style={{maxWidth:'350px'}}
+        />
+        <button
+          className="form-btn"
+          style={{marginLeft:'1rem'}}
+          onClick={() => window.location.href='/add'}
+        >Add New Data</button>
+      </div>
       <div className="table-container">
         <table className="matrix-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
               <th>Method</th>
               <th>Timestamp</th>
               <th>Actions</th>
@@ -69,17 +75,19 @@ function ManageDataPage() {
           </thead>
           <tbody>
             {filteredData.length === 0 ? (
-              <tr><td colSpan={5}>No data found.</td></tr>
+              <tr><td colSpan={4}>No data found.</td></tr>
             ) : (
               filteredData.map(item => (
                 <tr key={item._id}>
                   <td>{item._id}</td>
-                  <td>{item.name ? String(item.name).replace(/</g, '&lt;').replace(/>/g, '&gt;') : '-'}</td>
                   <td>{item.method?.name || '-'}</td>
                   <td>{item.sampleMeta?.timestamp ? new Date(item.sampleMeta.timestamp).toLocaleString() : '-'}</td>
                   <td>
-                    <Link to={`/edit/${item._id}`} className="edit-link">Edit</Link>
-                    {' | '}
+                    <button
+                      className="edit-link form-btn"
+                      style={{marginRight:'0.5rem'}}
+                      onClick={() => window.location.href=`/edit/${item._id}`}
+                    >Edit</button>
                     <button
                       className="delete-btn"
                       onClick={() => handleDelete(item._id)}

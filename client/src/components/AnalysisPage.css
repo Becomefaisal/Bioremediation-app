@@ -108,11 +108,11 @@
 }
 .matrix-table th {
   color: #ffd600;
-  background: #f7f7f7;
+  background: #23272f;
   font-weight: 600;
 }
 .matrix-table td {
-  background: #222;
+  background: #18191c;
   color: #fff;
 }
 .edit-link {
@@ -128,10 +128,10 @@
   color: #fff;
   background: #d32f2f;
   border: none;
-  border-radius: 4px;
-  padding: 0.4rem 0.8rem;
+  border-radius: 7px;
+  padding: 0.7rem 1.5rem;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   margin-left: 0.5rem;
   transition: background 0.2s;
 }
@@ -183,4 +183,51 @@
   margin: 2rem auto;
   max-width: 500px;
   border: 2px solid #ffd600;
+}
+.prediction-card {
+  background: #23272f;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  padding: 2.5rem 2rem 2rem 2rem;
+  color: #fff;
+  max-width: 1100px;
+  margin: 2.5rem auto;
+  border: 2px solid #ffd600;
+}
+.prediction-style-card {
+  background: #23272f;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  padding: 2.5rem 2rem 2rem 2rem;
+  color: #fff;
+  max-width: 1100px;
+  margin: 2.5rem auto;
+  border: 2px solid #ffd600;
+}
+.form-btn {
+  background: #ffd700;
+  color: #18191c;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 7px;
+  padding: 0.7rem 2.2rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.form-btn:hover {
+  background: #fff;
+  color: #18191c;
+}
+.edit-link.form-btn {
+  background: #1976d2;
+  color: #fff;
+  border-radius: 7px;
+  padding: 0.7rem 1.5rem;
+  font-weight: 600;
+  border: none;
+  margin-right: 0.5rem;
+}
+.edit-link.form-btn:hover {
+  background: #1565c0;
 }
