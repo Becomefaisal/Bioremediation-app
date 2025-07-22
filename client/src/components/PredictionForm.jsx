@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './PredictionForm.css';
-import { useState, useRef, useEffect } from 'react';
 import './AnalysisPage.css';
 
 const PredictionForm = () => {
