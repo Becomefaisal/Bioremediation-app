@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './AnalysisPage.css'; // Reuse design styles
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 function ManageDataPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +12,7 @@ function ManageDataPage() {
   const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
-    fetch('/api/samples')
+    fetch(`${API_BASE}/api/samples`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch');
         return res.json();
@@ -24,7 +26,7 @@ function ManageDataPage() {
     if (!window.confirm('Are you sure you want to delete this entry?')) return;
     setDeleting(id);
     try {
-      const res = await fetch(`/api/samples/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/api/samples/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Delete failed');
       setData(data.filter(item => item._id !== id));
     } catch (err) {
