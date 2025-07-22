@@ -9,6 +9,8 @@ import BatchDetail from './components/BatchDetail';
 import AnalysisPage from './components/AnalysisPage';
 import PredictionForm from './components/PredictionForm';
 import './App.css';
+import ManageDataPage from './components/ManageDataPage';
+import EditDataPage from './components/EditDataPage';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="/batch/:batchId" element={<BatchDetail />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/prediction" element={<PredictionForm />} />
+        <Route path="/manage" element={<ManageDataPage />} />
+        <Route path="/edit/:id" element={<EditDataPage />} />
         <Route path="*" element={<Dashboard />} />
       </Routes>
     </Router>

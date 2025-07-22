@@ -134,4 +134,41 @@ router.get('/method-names', async (req, res) => {
   }
 });
 
+// GET single sample by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const sample = await SampleEntry.findById(req.params.id);
+    if (!sample) return res.status(404).json({ error: 'Not found' });
+    res.json(sample);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// PUT update sample by ID
+router.put('/:id', async (req, res) => {
+  try {
+    const updated = await SampleEntry.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!updated) return res.status(404).json({ error: 'Not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: 'Update failed', details: err.message });
+  }
+});
+
+// DELETE sample by ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await SampleEntry.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Delete failed' });
+  }
+});
+
 module.exports = router;
