@@ -101,7 +101,6 @@ function Typewriter({ text }) {
           <button
             className={activeTab === 'chat' ? 'active' : ''}
             onClick={() => setActiveTab('chat')}
-            disabled={result === null}
           >Ask AI About Prediction</button>
         </div>
         {activeTab === 'predict' && (
@@ -168,21 +167,22 @@ function Typewriter({ text }) {
           </div>
         )}
         {activeTab === 'predict' && error && <p className="error">{error}</p>}
-        {activeTab === 'chat' && result !== null && (
+        {activeTab === 'chat' && (
           <div className="chat-tab-container">
-            <button className="open-chat-btn" onClick={() => setChatOpen(true)}>
-              Open AI Q&A Chat
-            </button>
-            <PredictionChatModal
-              open={chatOpen}
-              onClose={() => setChatOpen(false)}
-              predictionContext={{ input, prediction: result }}
-            />
-          </div>
-        )}
-        {activeTab === 'chat' && result === null && (
-          <div className="chat-tab-container">
-            <p className="status-info">Please generate a prediction first to ask AI about it.</p>
+            {result !== null ? (
+              <>
+                <button className="open-chat-btn" onClick={() => setChatOpen(true)}>
+                  Open AI Q&A Chat
+                </button>
+                <PredictionChatModal
+                  open={chatOpen}
+                  onClose={() => setChatOpen(false)}
+                  predictionContext={{ input, prediction: result }}
+                />
+              </>
+            ) : (
+              <p className="status-info">Please generate a prediction first to ask AI about it.</p>
+            )}
           </div>
         )}
       </div>
