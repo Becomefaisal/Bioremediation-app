@@ -1,76 +1,306 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import './PredictionForm.css';
-import './AnalysisPage.css';
+
+const pollutantOptions = [
+  'Oil',
+  'Heavy Metal',
+  'Pesticide',
+  'Solvent',
+  'Plastic',
+  'Pharmaceutical',
+  'Other',
+];
+
+const remediationOptions = [
+  'Phytoremediation',
+  'Bioventing',
+  'Bioaugmentation',
+  'Biostimulation',
+  'Composting',
+  'Landfarming',
+  'Other',
+];
+
+const initialInput = {
+  pollutantType: '',
+  concentration: '',
+  temperature: '',
+  ph: '',
+  remediationMethod: '',
+  duration: '',
+  siteDescription: '',
+  microbes: '',
+};
+
+function Typewriter({ text }) {
+  const [displayed, setDisplayed] = useState('');
+  React.useEffect(() => {
+    setDisplayed('');
+    if (!text) return;
+    let i = 0;
+    const interval = setInterval(() => {
+      setDisplayed((prev) => prev + text[i]);
+      i++;
+      if (i >= text.length) clearInterval(interval);
+    }, 18);
+    return () => clearInterval(interval);
+  }, [text]);
+  return <span>{displayed}</span>;
+}
+
+function getSessionId() {
+  let id = localStorage.getItem('sessionId');
+  if (!id) {
+    id = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    localStorage.setItem('sessionId', id);
+  }
+  return id;
+}
 
 const PredictionForm = () => {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialInput);
+  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [abortController, setAbortController] = useState(null);
   const [error, setError] = useState(null);
-  const chatEndRef = useRef(null);
+  const [status, setStatus] = useState('');
+  const [chatHistory, setChatHistory] = useState([]); // [{role: 'user'|'ai', content: string}]
+  const [question, setQuestion] = useState('');
+  const [followUp, setFollowUp] = useState('');
+  const [asking, setAsking] = useState(false);
+  const [lastPredictedInput, setLastPredictedInput] = useState(null); // Store input used for last prediction
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
+  const handleChange = (e) => {
+    setInput({ ...input, [e.target.name]: e.target.value });
+  };
 
-  const sendMessage = async () => {
-    if (!input.trim()) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
     setError(null);
-    const userMsg = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMsg]);
+    setResult(null);
+    setStatus('Generating prediction...');
+    const controller = new AbortController();
+    setAbortController(controller);
     try {
-      const res = await fetch(`${apiUrl}/api/ai-chat`, {
+      const res = await fetch(`${apiUrl}/api/predict`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: input }),
+        headers: { 'Content-Type': 'application/json', 'x-session-id': getSessionId() },
+        body: JSON.stringify(input),
+        signal: controller.signal,
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResult(data.prediction);
+        setStatus('');
+        setLastPredictedInput(input); // Store the input used for this prediction
+        // Always start chat history with the prediction as the first AI message
+        let newChatHistory = [{ role: 'ai', content: data.prediction, typewriter: true }];
+        // If user asked an initial question, send it to the AI and add both Q and A to chat
+        if (question.trim()) {
+          newChatHistory.push({ role: 'user', content: question });
+          setChatHistory(newChatHistory); // Show user question immediately
+          // Call AI endpoint with question and sample (input)
+          try {
+            const aiRes = await fetch(`${apiUrl}/api/ai-chat/ask`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-session-id': getSessionId() },
+              body: JSON.stringify({ question, sample: input }),
+            });
+            const aiData = await aiRes.json();
+            if (aiRes.ok && aiData.answer) {
+              setChatHistory(prev => [...prev, { role: 'ai', content: aiData.answer, typewriter: true }]);
+            } else {
+              setError(aiData.error || 'AI response failed');
+            }
+          } catch {
+            setError('Network error');
+          }
+        } else {
+          setChatHistory(newChatHistory);
+        }
+        setQuestion('');
+      } else {
+        setError(data.error || 'Prediction failed');
+        setStatus('');
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        setError('Prediction stopped by user.');
+      } else {
+        setError('Network error');
+      }
+      setStatus('');
+    }
+    setLoading(false);
+    setAbortController(null);
+  };
+
+  const handleAsk = async (e) => {
+    e.preventDefault();
+    if (!question.trim()) return;
+    setAsking(true);
+    setError(null);
+    setChatHistory(prev => [...prev, { role: 'user', content: question }]);
+    try {
+      const res = await fetch(`${apiUrl}/api/ai-chat/ask`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-session-id': getSessionId() },
+        body: JSON.stringify({ question, sample: input }),
       });
       const data = await res.json();
       if (res.ok && data.answer) {
-        setMessages((prev) => [...prev, { role: 'ai', content: data.answer }]);
+        setChatHistory(prev => [...prev, { role: 'ai', content: data.answer, typewriter: true }]);
       } else {
         setError(data.error || 'AI response failed');
       }
     } catch {
       setError('Network error');
     }
-    setLoading(false);
-    setInput('');
+    setAsking(false);
+    setQuestion('');
   };
 
-  const handleInputKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+  const handleFollowUp = async (e) => {
+    e.preventDefault();
+    if (!followUp.trim()) return;
+    setAsking(true);
+    setError(null);
+    setChatHistory(prev => [...prev, { role: 'user', content: followUp }]);
+    try {
+      // Use the input from the last prediction for all follow-up questions
+      const res = await fetch(`${apiUrl}/api/ai-chat/ask`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-session-id': getSessionId() },
+        body: JSON.stringify({ question: followUp, sample: lastPredictedInput }),
+      });
+      const data = await res.json();
+      if (res.ok && data.answer) {
+        setChatHistory(prev => [...prev, { role: 'ai', content: data.answer, typewriter: true }]);
+      } else {
+        setError(data.error || 'AI response failed');
+      }
+    } catch {
+      setError('Network error');
     }
+    setAsking(false);
+    setFollowUp('');
   };
 
   return (
     <div className="prediction-form-container extra-wide">
-      <h2>Ask AI About Bioremediation</h2>
-      <div className="chat-modal">
-        <div className="chat-history scrollable">
-          {messages.map((msg, idx) => (
-            <div key={idx} className={`chat-msg ${msg.role}`}>{msg.content}</div>
-          ))}
-          <div ref={chatEndRef} />
+      <h2>AI Bioremediation Prediction</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-row">
+          <label>
+            Pollutant Type
+            <select name="pollutantType" value={input.pollutantType} onChange={handleChange} required>
+              <option value="" disabled>Select pollutant</option>
+              {pollutantOptions.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Concentration (mg/L)
+            <input name="concentration" value={input.concentration} onChange={handleChange} required type="number" min="0" step="any" placeholder="e.g. 50" />
+          </label>
         </div>
-        {error && <div className="error">{error}</div>}
-        <textarea
-          className="chat-input"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleInputKeyDown}
-          placeholder="Ask a question about bioremediation, predictions, methods, etc..."
-          rows={2}
-          disabled={loading}
-        />
-        <button onClick={sendMessage} disabled={loading || !input.trim()} className="send-btn">Send</button>
-        {loading && <div className="status-info">AI is thinking...</div>}
-      </div>
+        <div className="form-row">
+          <label>
+            Temperature (°C)
+            <input name="temperature" value={input.temperature} onChange={handleChange} required type="number" step="any" placeholder="e.g. 25" />
+          </label>
+          <label>
+            pH
+            <input name="ph" value={input.ph} onChange={handleChange} required type="number" step="any" placeholder="e.g. 7" />
+          </label>
+        </div>
+        <div className="form-row">
+          <label>
+            Remediation Method
+            <select name="remediationMethod" value={input.remediationMethod} onChange={handleChange} required>
+              <option value="" disabled>Select method</option>
+              {remediationOptions.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Duration (days)
+            <input name="duration" value={input.duration} onChange={handleChange} required type="number" min="1" placeholder="e.g. 30" />
+          </label>
+        </div>
+        <div className="form-row">
+          <label className="full-width">
+            Microbes to be used
+            <input name="microbes" value={input.microbes} onChange={handleChange} required placeholder="e.g. Pseudomonas, Bacillus, Fungi, etc." />
+          </label>
+        </div>
+        <div className="form-row">
+          <label className="full-width">
+            Site Description
+            <textarea name="siteDescription" value={input.siteDescription} onChange={handleChange} required placeholder="Describe the site, soil type, history, etc." rows={3} />
+          </label>
+        </div>
+        {/* Ask a question before prediction */}
+        <div className="form-row">
+          <label className="full-width">
+            Ask a question (optional)
+            <input
+              type="text"
+              value={question}
+              onChange={e => setQuestion(e.target.value)}
+              placeholder="e.g. What is the expected outcome?"
+              disabled={loading || asking}
+            />
+          </label>
+        </div>
+        <button type="submit" disabled={loading}>Predict</button>
+      </form>
+      {loading && <p className="status-info">{status}</p>}
+      {loading && (
+        <button type="button" onClick={() => { if (abortController) abortController.abort(); }} style={{marginTop:'1rem',background:'#c62828',color:'#fff',padding:'8px 18px',border:'none',borderRadius:'6px',fontWeight:600,cursor:'pointer'}}>Stop Prediction</button>
+      )}
+      {error && <p className="error">{error}</p>}
+      {/* Chat history and follow-up after prediction */}
+      {result !== null && (
+        <div className="prediction-result typewriter-effect scrollable-chat" style={{maxHeight:'220px',overflowY:'auto',marginTop:'2rem',marginBottom:'1rem'}}>
+          {chatHistory.map((msg, idx) => (
+            <div key={idx} style={{
+              background: msg.role === 'ai' ? 'rgba(46, 125, 50, 0.18)' : 'rgba(33, 150, 243, 0.12)',
+              color: msg.role === 'ai' ? '#00e676' : '#1976d2',
+              padding: '10px 16px',
+              borderRadius: '8px',
+              marginBottom: '8px',
+              fontFamily: 'monospace',
+              fontSize: '1.1rem',
+              whiteSpace: 'pre-wrap',
+              fontWeight: msg.role === 'ai' ? 600 : 400
+            }}>
+              {msg.role === 'ai' ? <span>AI: </span> : <span>You: </span>}
+              {msg.typewriter ? <Typewriter text={msg.content} /> : msg.content}
+            </div>
+          ))}
+        </div>
+      )}
+      {result !== null && (
+        <form onSubmit={handleFollowUp} style={{marginTop:'1rem'}}>
+          <label className="full-width">
+            Ask a follow-up question
+            <input
+              type="text"
+              value={followUp}
+              onChange={e => setFollowUp(e.target.value)}
+              placeholder="Type your follow-up question..."
+              disabled={asking}
+            />
+          </label>
+          <button type="submit" className="send-btn" disabled={asking || !followUp.trim()} style={{marginTop:'0.5rem'}}>Send</button>
+        </form>
+      )}
+      {asking && <div className="status-info">AI is thinking...</div>}
     </div>
   );
 };

@@ -37,6 +37,8 @@ router.post('/', async (req, res) => {
     if (!input || typeof input !== 'object') {
         return res.status(400).json({ error: 'Invalid input' });
     }
+    // Use a sessionId from header/cookie, or fallback to IP for demo
+    const sessionId = req.headers['x-session-id'] || req.ip;
     try {
         const aiResult = await queryOpenRouter(input);
         let cleaned = aiResult
@@ -48,12 +50,12 @@ router.post('/', async (req, res) => {
             .filter(line => line.length > 0)
             .join(' ')
             .trim();
-        // Remove any trailing undefined or te left after join/trim
         cleaned = cleaned.replace(/^(te|Te)\b[ ]*/i, 'The ').replace(/undefined$/gi, '').trim();
-        // If the cleaned result is empty or default, return a more user-friendly message
         if (!cleaned || cleaned === 'No prediction returned.') {
             cleaned = 'No prediction could be generated for the provided input.';
         }
+        // Store the last prediction context for this session
+        setLastPrediction(sessionId, input);
         res.json({ prediction: cleaned });
     } catch (err) {
         console.error('OpenRouter API error:', err.message);

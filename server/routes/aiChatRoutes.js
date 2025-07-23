@@ -1,14 +1,67 @@
 const express = require('express');
 const router = express.Router();
 
-// Dummy AI response for demonstration
+
+
+// Session store for last prediction context
+const { getLastPrediction } = require('../utils/sessionStore');
+const axios = require('axios');
+require('dotenv').config();
+
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+async function queryOpenRouterFollowup(sample, question) {
+  // Compose a prompt that includes the scenario and the follow-up question
+  const prompt = `You are an expert in bioremediation. Given the following scenario, answer the user's follow-up question in 3-5 sentences. Be concise and direct.\n\nScenario Details:\n- Pollutant Type: ${sample.pollutantType}\n- Concentration: ${sample.concentration} mg/L\n- Temperature: ${sample.temperature} °C\n- pH: ${sample.ph}\n- Remediation Method: ${sample.remediationMethod}\n- Duration: ${sample.duration} days\n- Microbes: ${sample.microbes}\n- Site Description: ${sample.siteDescription}\n\nUser's Question: ${question}\n\nAnswer:`;
+  const response = await axios.post(
+    'https://openrouter.ai/api/v1/chat/completions',
+    {
+      model: 'moonshotai/kimi-dev-72b:free',
+      messages: [
+        { role: 'user', content: prompt }
+      ],
+    },
+    {
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+  const aiMessage = response.data.choices && response.data.choices[0] && response.data.choices[0].message && response.data.choices[0].message.content
+    ? response.data.choices[0].message.content.trim()
+    : 'No answer returned.';
+  return aiMessage;
+}
+
 router.post('/ask', async (req, res) => {
-  const { question, sample } = req.body;
-  // Here you would call your AI model/API with the question and sample context
-  // For now, just echo the question and sample ID
-  res.json({
-    answer: `AI response to "${question}" for sample ${sample._id}`
-  });
+  let { question, sample } = req.body;
+  const sessionId = req.headers['x-session-id'] || req.ip;
+  if (!sample) {
+    sample = getLastPrediction(sessionId);
+  }
+  if (!sample) {
+    return res.json({ answer: 'No prediction context found. Please make a prediction first.' });
+  }
+  try {
+    const aiResult = await queryOpenRouterFollowup(sample, question);
+    let cleaned = aiResult
+      .replace(/([<◁][t]?hink[▷>][\s\S]*?[<◁]\/?.*?[▷>])/gi, '')
+      .replace(/^(te|Te)\b[ ]*/i, 'The ')
+      .replace(/undefined/gi, '')
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .join(' ')
+      .trim();
+    cleaned = cleaned.replace(/^(te|Te)\b[ ]*/i, 'The ').replace(/undefined$/gi, '').trim();
+    if (!cleaned || cleaned === 'No answer returned.') {
+      cleaned = 'No answer could be generated for the provided question.';
+    }
+    res.json({ answer: cleaned });
+  } catch (err) {
+    console.error('OpenRouter API error (follow-up):', err.message);
+    res.status(500).json({ error: 'AI follow-up failed' });
+  }
 });
 
 module.exports = router;
