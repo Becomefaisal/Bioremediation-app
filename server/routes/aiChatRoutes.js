@@ -10,8 +10,9 @@ require('dotenv').config();
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 async function queryOpenRouterFollowup(sample, question) {
-  // Compose a prompt that includes the scenario and the follow-up question
-  const prompt = `You are an expert in bioremediation. Given the following scenario, answer the user's follow-up question in 3-5 sentences. Be concise and direct.\n\nScenario Details:\n- Pollutant Type: ${sample.pollutantType}\n- Concentration: ${sample.concentration} mg/L\n- Temperature: ${sample.temperature} °C\n- pH: ${sample.ph}\n- Remediation Method: ${sample.remediationMethod}\n- Duration: ${sample.duration} days\n- Microbes: ${sample.microbes}\n- Site Description: ${sample.siteDescription}\n\nUser's Question: ${question}\n\nAnswer:`;
+  // Compose a prompt that includes the entire sample as context
+  const sampleDetails = JSON.stringify(sample, null, 2);
+  const prompt = `You are an expert in bioremediation. Given the following sample data, answer the user's question in 3-5 sentences. Be concise, direct, and use the data provided.\n\nSample Data (JSON):\n${sampleDetails}\n\nUser's Question: ${question}\n\nAnswer:`;
   const response = await axios.post(
     'https://openrouter.ai/api/v1/chat/completions',
     {
@@ -51,7 +52,7 @@ router.post('/ask', async (req, res) => {
       .map(line => line.trim())
       .filter(line => line.length > 0)
       .join(' ')
-      .replace(/\bundefined[\.,!?:;]?/gi, '') // Remove all standalone 'undefined' words with optional punctuation
+      .replace(/undefined/gi, '') // Remove all 'undefined' tokens, anywhere
       .replace(/\s{2,}/g, ' ') // Remove extra spaces
       .trim();
     cleaned = cleaned.replace(/^(te|Te)\b[ ]*/i, 'The ').trim();
