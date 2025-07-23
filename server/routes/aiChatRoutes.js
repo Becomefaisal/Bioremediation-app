@@ -47,13 +47,14 @@ router.post('/ask', async (req, res) => {
     let cleaned = aiResult
       .replace(/([<◁][t]?hink[▷>][\s\S]*?[<◁]\/?.*?[▷>])/gi, '')
       .replace(/^(te|Te)\b[ ]*/i, 'The ')
-      .replace(/undefined/gi, '')
       .split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0)
       .join(' ')
+      .replace(/\bundefined[\.,!?:;]?/gi, '') // Remove all standalone 'undefined' words with optional punctuation
+      .replace(/\s{2,}/g, ' ') // Remove extra spaces
       .trim();
-    cleaned = cleaned.replace(/^(te|Te)\b[ ]*/i, 'The ').replace(/undefined$/gi, '').trim();
+    cleaned = cleaned.replace(/^(te|Te)\b[ ]*/i, 'The ').trim();
     if (!cleaned || cleaned === 'No answer returned.') {
       cleaned = 'No answer could be generated for the provided question.';
     }
