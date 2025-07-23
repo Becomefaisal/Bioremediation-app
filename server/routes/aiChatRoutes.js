@@ -60,7 +60,9 @@ router.post('/ask', async (req, res) => {
     res.json({ answer: cleaned });
   } catch (err) {
     console.error('OpenRouter API error (follow-up):', err.message);
-    res.status(500).json({ error: 'AI follow-up failed' });
+    // Fallback: return a context-aware answer if AI is down
+    const fallback = `Based on your scenario (pollutant: ${sample.pollutantType}, concentration: ${sample.concentration} mg/L, method: ${sample.remediationMethod}, duration: ${sample.duration} days, microbes: ${sample.microbes}), a likely answer to your question "${question}" is: optimal bioremediation depends on maintaining proper conditions and using effective microbes. For more details, consult a bioremediation expert.`;
+    res.json({ answer: 'AI prediction failed due to some internal error.' });
   }
 });
 

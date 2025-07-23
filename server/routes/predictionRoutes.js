@@ -31,6 +31,8 @@ async function queryOpenRouter(input) {
 const express = require('express');
 const router = express.Router();
 
+// Session store for last prediction context
+const { setLastPrediction } = require('../utils/sessionStore');
 // POST /api/predict
 router.post('/', async (req, res) => {
     const input = req.body;
