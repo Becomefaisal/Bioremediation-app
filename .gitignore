@@ -5,6 +5,7 @@ client/dist/
 client/build/
 server/node_modules/
 client/node_modules/
+client/.env
 # Ignore OS files
 .DS_Store
 Thumbs.db
@@ -17,3 +18,4 @@ Thumbs.db
 server/sample_data.generated.json
 server/test.js
 client/src/components/debug_regression_matrix.js
+server/.env
