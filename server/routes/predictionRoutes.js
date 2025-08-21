@@ -1,27 +1,25 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-console.log('OPENROUTER_API_KEY loaded:', !!OPENROUTER_API_KEY);
-async function queryOpenRouter(input) {
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+console.log('OPENAI_API_KEY loaded:', !!OPENAI_API_KEY);
+async function queryOpenAI(input) {
     const prompt = `You are an expert in bioremediation. Given the following scenario, provide ONLY the most likely final outcome (in 4-5 sentences ) of the bioremediation process, based on the parameters. Do NOT include your reasoning, thinking, or bullet points. Be concise and direct.\n\nScenario Details:\n- Pollutant Type: ${input.pollutantType}\n- Concentration: ${input.concentration} mg/L\n- Temperature: ${input.temperature} °C\n- pH: ${input.ph}\n- Remediation Method: ${input.remediationMethod}\n- Duration: ${input.duration} days\n- Microbes: ${input.microbes}\n- Site Description: ${input.siteDescription}\n\nFinal Likely Outcome:`;
     const response = await axios.post(
-        'https://openrouter.ai/api/v1/chat/completions',
+        'https://api.openai.com/v1/chat/completions',
         {
-            model: 'openai/gpt-oss-20b:free',
+            model: 'gpt-3.5-turbo',
             messages: [
                 { role: 'user', content: prompt }
-            ],
-            // Remove max_tokens to avoid token limit
+            ]
         },
         {
             headers: {
-                'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
                 'Content-Type': 'application/json'
             }
         }
     );
-    // Return the full AI message without post-processing
     const aiMessage = response.data.choices && response.data.choices[0] && response.data.choices[0].message && response.data.choices[0].message.content
         ? response.data.choices[0].message.content.trim()
         : 'No prediction returned.';
@@ -42,7 +40,7 @@ router.post('/', async (req, res) => {
     // Use a sessionId from header/cookie, or fallback to IP for demo
     const sessionId = req.headers['x-session-id'] || req.ip;
     try {
-        const aiResult = await queryOpenRouter(input);
+        const aiResult = await queryOpenAI(input);
         let cleaned = aiResult
             .replace(/([<◁][t]?hink[▷>][\s\S]*?[<◁]\/?.*?[▷>])/gi, '')
             .replace(/^(te|Te)\b[ ]*/i, 'The ')
@@ -60,7 +58,7 @@ router.post('/', async (req, res) => {
         setLastPrediction(sessionId, input);
         res.json({ prediction: cleaned });
     } catch (err) {
-        console.error('OpenRouter API error:', err.message);
+        console.error('OpenAI API error:', err.message);
         res.status(500).json({ error: 'AI prediction failed' });
     }
 });
