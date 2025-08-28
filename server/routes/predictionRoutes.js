@@ -49,8 +49,13 @@ router.post('/', async (req, res) => {
         setLastPrediction(sessionId, input);
         res.json({ prediction: cleaned });
     } catch (err) {
-    console.error('Gemini API error:', err.message);
-        res.status(500).json({ error: 'AI prediction failed' });
+        if (err.response) {
+            console.error('Gemini API error:', err.response.status, err.response.data);
+            res.status(500).json({ error: 'Gemini API error', details: err.response.data });
+        } else {
+            console.error('Gemini API error:', err.message);
+            res.status(500).json({ error: 'AI prediction failed', details: err.message });
+        }
     }
 });
 
