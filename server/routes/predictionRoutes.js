@@ -1,26 +1,18 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-async function queryOpenAIPrediction(input) {
+const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY;
+async function queryGeminiPrediction(input) {
     const prompt = `You are an expert in bioremediation. Given the following scenario, provide ONLY the most likely final outcome (in 4-5 sentences) of the bioremediation process, based on the parameters. Do NOT include your reasoning, thinking, or bullet points. Be concise and direct.\n\nScenario Details:\n- Pollutant Type: ${input.pollutantType}\n- Concentration: ${input.concentration} mg/L\n- Temperature: ${input.temperature} °C\n- pH: ${input.ph}\n- Remediation Method: ${input.remediationMethod}\n- Duration: ${input.duration} days\n- Microbes: ${input.microbes}\n- Site Description: ${input.siteDescription}\n\nFinal Likely Outcome:`;
-    const response = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
-        {
-            model: 'gpt-3.5-turbo',
-            messages: [
-                { role: 'user', content: prompt }
-            ]
-        },
-        {
-            headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        }
-    );
-    const aiMessage = response.data.choices && response.data.choices[0] && response.data.choices[0].message && response.data.choices[0].message.content
-        ? response.data.choices[0].message.content.trim()
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+    const body = {
+        contents: [{ parts: [{ text: prompt }] }]
+    };
+    const response = await axios.post(url, body, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const aiMessage = response.data.candidates && response.data.candidates[0] && response.data.candidates[0].content && response.data.candidates[0].content.parts && response.data.candidates[0].content.parts[0].text
+        ? response.data.candidates[0].content.parts[0].text.trim()
         : 'No prediction returned.';
     return aiMessage;
 }
@@ -39,7 +31,7 @@ router.post('/', async (req, res) => {
     // Use a sessionId from header/cookie, or fallback to IP for demo
     const sessionId = req.headers['x-session-id'] || req.ip;
     try {
-    const aiResult = await queryOpenAIPrediction(input);
+    const aiResult = await queryGeminiPrediction(input);
         let cleaned = aiResult
             .replace(/([<◁][t]?hink[▷>][\s\S]*?[<◁]\/?.*?[▷>])/gi, '')
             .replace(/^(te|Te)\b[ ]*/i, 'The ')
@@ -57,7 +49,7 @@ router.post('/', async (req, res) => {
         setLastPrediction(sessionId, input);
         res.json({ prediction: cleaned });
     } catch (err) {
-    console.error('OpenAI API error:', err.message);
+    console.error('Gemini API error:', err.message);
         res.status(500).json({ error: 'AI prediction failed' });
     }
 });

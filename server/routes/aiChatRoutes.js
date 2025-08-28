@@ -8,28 +8,20 @@ const { getLastPrediction } = require('../utils/sessionStore');
 const axios = require('axios');
 require('dotenv').config();
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY;
 async function queryOpenRouterFollowup(sample, question) {
   // Compose a prompt that includes the entire sample as context
   const sampleDetails = JSON.stringify(sample, null, 2);
   const prompt = `You are an expert in bioremediation. Given the following sample data, answer the user's question in 3-5 sentences. Be concise, direct, and use the data provided.\n\nSample Data (JSON):\n${sampleDetails}\n\nUser's Question: ${question}\n\nAnswer:`;
-  const response = await axios.post(
-    'https://api.openai.com/v1/chat/completions',
-    {
-      model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'user', content: prompt }
-      ]
-    },
-    {
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    }
-  );
-  const aiMessage = response.data.choices && response.data.choices[0] && response.data.choices[0].message && response.data.choices[0].message.content
-    ? response.data.choices[0].message.content.trim()
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }]
+  };
+  const response = await axios.post(url, body, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const aiMessage = response.data.candidates && response.data.candidates[0] && response.data.candidates[0].content && response.data.candidates[0].content.parts && response.data.candidates[0].content.parts[0].text
+    ? response.data.candidates[0].content.parts[0].text.trim()
     : 'No answer returned.';
   return aiMessage;
 }
@@ -61,7 +53,7 @@ router.post('/ask', async (req, res) => {
     }
     res.json({ answer: cleaned });
   } catch (err) {
-  console.error('OpenAI API error (follow-up):', err.message);
+  console.error('Gemini API error (follow-up):', err.message);
     // Fallback: return a context-aware answer if AI is down
     const fallback = `Based on your scenario (pollutant: ${sample.pollutantType}, concentration: ${sample.concentration} mg/L, method: ${sample.remediationMethod}, duration: ${sample.duration} days, microbes: ${sample.microbes}), a likely answer to your question \"${question}\" is: optimal bioremediation depends on maintaining proper conditions and using effective microbes. For more details, consult a bioremediation expert.`;
     res.json({ answer: 'AI prediction failed due to some internal error.' });
