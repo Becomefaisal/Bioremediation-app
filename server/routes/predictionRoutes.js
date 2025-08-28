@@ -4,7 +4,7 @@ require('dotenv').config();
 const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY;
 async function queryGeminiPrediction(input) {
     const prompt = `You are an expert in bioremediation. Given the following scenario, provide ONLY the most likely final outcome (in 4-5 sentences) of the bioremediation process, based on the parameters. Do NOT include your reasoning, thinking, or bullet points. Be concise and direct.\n\nScenario Details:\n- Pollutant Type: ${input.pollutantType}\n- Concentration: ${input.concentration} mg/L\n- Temperature: ${input.temperature} °C\n- pH: ${input.ph}\n- Remediation Method: ${input.remediationMethod}\n- Duration: ${input.duration} days\n- Microbes: ${input.microbes}\n- Site Description: ${input.siteDescription}\n\nFinal Likely Outcome:`;
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-8b-001:generateContent?key=${GEMINI_API_KEY}`;
     const body = {
         contents: [{ parts: [{ text: prompt }] }]
     };
