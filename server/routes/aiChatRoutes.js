@@ -8,22 +8,22 @@ const { getLastPrediction } = require('../utils/sessionStore');
 const axios = require('axios');
 require('dotenv').config();
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-async function queryOpenAIFollowup(sample, question) {
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+async function queryOpenRouterFollowup(sample, question) {
   // Compose a prompt that includes the entire sample as context
   const sampleDetails = JSON.stringify(sample, null, 2);
   const prompt = `You are an expert in bioremediation. Given the following sample data, answer the user's question in 3-5 sentences. Be concise, direct, and use the data provided.\n\nSample Data (JSON):\n${sampleDetails}\n\nUser's Question: ${question}\n\nAnswer:`;
   const response = await axios.post(
-    'https://api.openai.com/v1/chat/completions',
+    'https://openrouter.ai/api/v1/chat/completions',
     {
-      model: 'gpt-3.5-turbo',
+      model: 'moonshotai/kimi-dev-72b:free',
       messages: [
         { role: 'user', content: prompt }
       ]
     },
     {
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json'
       }
     }
@@ -44,7 +44,7 @@ router.post('/ask', async (req, res) => {
     return res.json({ answer: 'No prediction context found. Please make a prediction first.' });
   }
   try {
-    const aiResult = await queryOpenAIFollowup(sample, question);
+    const aiResult = await queryOpenRouterFollowup(sample, question);
     let cleaned = aiResult
       .replace(/([<◁][t]?hink[▷>][\s\S]*?[<◁]\/?.*?[▷>])/gi, '')
       .replace(/^(te|Te)\b[ ]*/i, 'The ')
@@ -61,9 +61,9 @@ router.post('/ask', async (req, res) => {
     }
     res.json({ answer: cleaned });
   } catch (err) {
-    console.error('OpenAI API error (follow-up):', err.message);
+    console.error('OpenRouter API error (follow-up):', err.message);
     // Fallback: return a context-aware answer if AI is down
-    const fallback = `Based on your scenario (pollutant: ${sample.pollutantType}, concentration: ${sample.concentration} mg/L, method: ${sample.remediationMethod}, duration: ${sample.duration} days, microbes: ${sample.microbes}), a likely answer to your question "${question}" is: optimal bioremediation depends on maintaining proper conditions and using effective microbes. For more details, consult a bioremediation expert.`;
+    const fallback = `Based on your scenario (pollutant: ${sample.pollutantType}, concentration: ${sample.concentration} mg/L, method: ${sample.remediationMethod}, duration: ${sample.duration} days, microbes: ${sample.microbes}), a likely answer to your question \"${question}\" is: optimal bioremediation depends on maintaining proper conditions and using effective microbes. For more details, consult a bioremediation expert.`;
     res.json({ answer: 'AI prediction failed due to some internal error.' });
   }
 });
