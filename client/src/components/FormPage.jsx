@@ -210,7 +210,7 @@ const FormPage = () => {
           <div className="form-section-desc">Enter all water quality values for before and after treatment.</div>
           <div className="form-grid">
             <div>
-              <div className="form-label" style={{ color: '#ffd700' }}>Before</div>
+              <div className="form-label" style={{ color: '#ed3ac9' }}>Before</div>
               <label className="form-label">pH</label>
               <input className="form-input" type="number" step="any" value={formData.waterQuality.before.pH} onChange={e => handleChange(e, 'waterQuality', 'before', 'pH')} placeholder="e.g. 7.2" />
               <label className="form-label">temperature</label>
@@ -227,7 +227,7 @@ const FormPage = () => {
               <input className="form-input" type="number" step="any" value={formData.waterQuality.before.TDS} onChange={e => handleChange(e, 'waterQuality', 'before', 'TDS')} placeholder="e.g. 1800 (mg/L)" />
             </div>
             <div>
-              <div className="form-label" style={{ color: '#ffd700' }}>After</div>
+              <div className="form-label" style={{ color: '#ed3ac9' }}>After</div>
               <label className="form-label">pH</label>
               <input className="form-input" type="number" step="any" value={formData.waterQuality.after.pH} onChange={e => handleChange(e, 'waterQuality', 'after', 'pH')} placeholder="e.g. 7.0" />
               <label className="form-label">temperature</label>

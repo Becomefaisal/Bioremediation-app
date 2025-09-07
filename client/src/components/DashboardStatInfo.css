@@ -17,8 +17,8 @@
   height: 1.1em; /* Decreased from 1.5em */
   border-radius: 50%;
   background: none;
-  border: 2px solid #ffd700;
-  color: #ffd700;
+  border: 2px solid #ed3ac9;
+  color: #ed3ac9;
   font-size: 0.95em; /* Decreased from 1.1em */
   font-weight: bold;
   cursor: pointer;
@@ -27,7 +27,7 @@
 }
 .dashboard-stat-info .info-icon:hover,
 .dashboard-stat-info .info-icon:focus {
-  background: #ffd700;
+  background: #ed3ac9;
   color: #18191c;
 }
 
@@ -38,8 +38,8 @@
   top: 2.2em;
   transform: translateX(-50%);
   background: #232323;
-  color: #ffd700;
-  border: 1px solid #ffd700;
+  color: #ed3ac9;
+  border: 1px solid #ed3ac9;
   border-radius: 8px;
   padding: 0.7em 1.2em;
   font-size: 0.98em;

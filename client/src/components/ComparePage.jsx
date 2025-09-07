@@ -145,7 +145,7 @@ const ComparePage = () => {
       </div>
       {/* Chart Panel below, wider */}
       <div className="compare-chart-panel" style={{margin: '0 auto 2.5rem auto', minWidth: 500, maxWidth: 800, width: '90%'}}>
-        <div style={{color:'#ffd700', fontWeight:700, fontSize:'1.15rem', marginBottom:12, display:'flex', alignItems:'center', gap:8}}>
+        <div style={{color:'#fff', fontWeight:700, fontSize:'1.15rem', marginBottom:12, display:'flex', alignItems:'center', gap:8}}>
           {(compareResult && !compareResult.error && lastComparedParam)
             ? `${PARAMETER_OPTIONS.find(opt => opt.key === lastComparedParam)?.label || lastComparedParam} Reduction (%)`
             : 'Reduction (%)'}

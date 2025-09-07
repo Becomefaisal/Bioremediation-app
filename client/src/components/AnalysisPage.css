@@ -1,5 +1,74 @@
+/* Main analysis container */
 .analysis-root {
-  color: #fff;
+  color: #232a3d;
+  background: #f7f8fa;
+  min-height: 100vh;
+}
+
+/* Statistics section */
+.statistics-section {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(34,42,61,0.08);
+  padding: 2.5rem 2rem;
+  margin: 2rem auto;
+  max-width: 700px;
+}
+.statistics-title {
+  color: #232a3d;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+.statistics-label {
+  color: #1976d2;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+.statistics-value {
+  color: #ffd600;
+  font-weight: 700;
+}
+.statistics-info {
+  color: #1976d2;
+  font-size: 1rem;
+  margin-left: 0.3rem;
+}
+
+/* Chart container */
+.chart-container {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(34,42,61,0.08);
+  padding: 2rem 1.5rem;
+  margin: 2rem auto;
+  max-width: 900px;
+}
+.chart-title {
+  color: #232a3d;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.chart-axis-label {
+  color: #1976d2;
+  font-weight: 600;
+}
+.chart-tick-label {
+  color: #232a3d;
+  font-size: 1rem;
+}
+.chart-line {
+  stroke: #ffd600;
+  stroke-width: 3;
+}
+.chart-point {
+  fill: #1976d2;
+  stroke: #fff;
+  stroke-width: 2;
+}
 /* Chat Modal Styles */
 .chat-modal {
   max-width: 500px;
@@ -123,9 +192,7 @@
   font-size: 1rem;
   margin-top: 8px;
 }
-  font-weight: 500;
-  margin-right: 0.5rem;
-}
+
 .edit-link:hover {
   text-decoration: underline;
 }
@@ -313,4 +380,15 @@
 }
 .tab-btn.active {
   border-bottom: 2px solid #ffd600;
+}
+.analysis-summary-cards{
+  position: relative;
+  margin-top: 0.5rem;
+  display: flex;
+}
+.analysis-controls{
+  display: flex;
+  justify-content: space-evenly;
+  gap: 1rem;
+  flex-wrap: wrap;
 }

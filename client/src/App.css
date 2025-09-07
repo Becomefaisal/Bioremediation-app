@@ -43,6 +43,7 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  background: #f4f6fc;
 }
 
 .logo {
@@ -93,4 +94,7 @@
 .dashboard-chart-container:hover {
   background: linear-gradient(120deg, #232323 80%, #223a5f 100%);
   box-shadow: 0 4px 32px rgba(34,58,95,0.18);
+}
+body{
+  background: #f4f6fc;
 }

@@ -241,43 +241,43 @@ const AnalysisPage = () => {
 
   return (
     <div className="analysis-root">
-      <h2>Statistical Analysis</h2>
+      <h2 className="statistics-title">Statistical Analysis</h2>
       {/* Summary statistics section at the top */}
-      <div className="analysis-section">
-        <h3>Summary Statistics <InfoIcon tooltip="Shows mean, median, std dev, min, max, and count for the selected parameter across all batches. Helps you quickly understand the distribution and spread of your data." /></h3>
+      <div className="statistics-section">
+        <h3 className="statistics-title">Summary Statistics <InfoIcon tooltip="Shows mean, median, std dev, min, max, and count for the selected parameter across all batches. Helps you quickly understand the distribution and spread of your data." /></h3>
         <div className="analysis-controls">
-          <label>Parameter:
-            <select value={param} onChange={e => setParam(e.target.value)}>
+          <label className="statistics-label">Parameter:
+            <select value={param} onChange={e => setParam(e.target.value)} className="styled-select" style={{marginLeft: "1.5rem"}}>
               {PARAM_OPTIONS.map(opt => <option key={opt.key} value={opt.key}>{opt.label}</option>)}
             </select>
           </label>
-          <label>Timing:
-            <select value={timing} onChange={e => setTiming(e.target.value)}>
+          <label className="statistics-label">Timing:
+            <select value={timing} onChange={e => setTiming(e.target.value)} className="styled-select"style={{marginLeft: "1.5rem"}}>
               <option value="before">Before Treatment</option>
               <option value="after">After Treatment</option>
             </select>
           </label>
         </div>
         <div className="analysis-summary-cards">
-          <div className="analysis-card">Mean: <b>{typeof summary.mean === 'number' ? summary.mean.toFixed(2) : 'N/A'}</b> <InfoIcon tooltip="The average value of the selected parameter." /></div>
-          <div className="analysis-card">Median: <b>{typeof summary.median === 'number' ? summary.median.toFixed(2) : 'N/A'}</b> <InfoIcon tooltip="The middle value when all values are sorted. Less sensitive to outliers than the mean." /></div>
-          <div className="analysis-card">Std Dev: <b>{typeof summary.std === 'number' ? summary.std.toFixed(2) : 'N/A'}</b> <InfoIcon tooltip="A measure of how spread out the values are. Higher means more variability." /></div>
-          <div className="analysis-card">Min: <b>{typeof summary.min === 'number' ? summary.min.toFixed(2) : 'N/A'}</b> <InfoIcon tooltip="The smallest value in the dataset." /></div>
-          <div className="analysis-card">Max: <b>{typeof summary.max === 'number' ? summary.max.toFixed(2) : 'N/A'}</b> <InfoIcon tooltip="The largest value in the dataset." /></div>
-          <div className="analysis-card">Count: <b>{summary.count}</b> <InfoIcon tooltip="The number of data points used in the calculation." /></div>
+          <div className="analysis-card"><span className="statistics-label">Mean:</span> <span className="statistics-value">{typeof summary.mean === 'number' ? summary.mean.toFixed(2) : 'N/A'}</span> <span className="statistics-info"><InfoIcon tooltip="The average value of the selected parameter." /></span></div>
+          <div className="analysis-card"><span className="statistics-label">Median:</span> <span className="statistics-value">{typeof summary.median === 'number' ? summary.median.toFixed(2) : 'N/A'}</span> <span className="statistics-info"><InfoIcon tooltip="The middle value when all values are sorted. Less sensitive to outliers than the mean." /></span></div>
+          <div className="analysis-card"><span className="statistics-label">Std Dev:</span> <span className="statistics-value">{typeof summary.std === 'number' ? summary.std.toFixed(2) : 'N/A'}</span> <span className="statistics-info"><InfoIcon tooltip="A measure of how spread out the values are. Higher means more variability." /></span></div>
+          <div className="analysis-card"><span className="statistics-label">Min:</span> <span className="statistics-value">{typeof summary.min === 'number' ? summary.min.toFixed(2) : 'N/A'}</span> <span className="statistics-info"><InfoIcon tooltip="The smallest value in the dataset." /></span></div>
+          <div className="analysis-card"><span className="statistics-label">Max:</span> <span className="statistics-value">{typeof summary.max === 'number' ? summary.max.toFixed(2) : 'N/A'}</span> <span className="statistics-info"><InfoIcon tooltip="The largest value in the dataset." /></span></div>
+          <div className="analysis-card"><span className="statistics-label">Count:</span> <span className="statistics-value">{summary.count}</span> <span className="statistics-info"><InfoIcon tooltip="The number of data points used in the calculation." /></span></div>
         </div>
         {/* Summary Line Chart */}
-        <div className="analysis-chart-container">
+        <div className="chart-container" style={{ background: '#232a3d', borderRadius: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.18)', padding: '1rem' }}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={Object.entries(batches).map(([batchId, batch]) => ({
               batchId,
               value: extractParamFromSample(batch[timing], param)
-            })).filter(d => typeof d.value === 'number' && !isNaN(d.value))}>
+            })).filter(d => typeof d.value === 'number' && !isNaN(d.value))} style={{ background: '#232a3d' }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
               <XAxis dataKey="batchId" angle={-45} textAnchor="end" height={60} interval={0} stroke="#ffd700" />
               <YAxis stroke="#ffd700" />
-              <RechartsTooltip />
-              <Legend />
+              <RechartsTooltip wrapperStyle={{ backgroundColor: '#232a3d', color: '#ffd700', border: '1px solid #ffd700', borderRadius: 8 }} contentStyle={{ backgroundColor: '#232a3d', color: '#ffd700', border: '1px solid #ffd700', borderRadius: 8 }} labelStyle={{ color: '#ffd700' }} />
+              <Legend wrapperStyle={{ color: '#ffd700' }} />
               <Line type="monotone" dataKey="value" stroke="#ffd700" strokeWidth={2} dot={{ r: 4 }} name={param + ' (' + timing + ')'} />
             </LineChart>
           </ResponsiveContainer>
@@ -289,12 +289,12 @@ const AnalysisPage = () => {
         <h3>Correlation Analysis <InfoIcon tooltip="Correlation between two parameters. Choose X and Y, then see the relationship." /></h3>
         <div className="analysis-controls analysis-controls-center">
           <label>X Parameter:
-            <select value={paramX} onChange={e => setParamX(e.target.value)}>
+            <select value={paramX} onChange={e => setParamX(e.target.value)} className="styled-select" style={{marginLeft: "1.5rem"}}>
               {PARAM_OPTIONS.map(opt => <option key={opt.key} value={opt.key}>{opt.label}</option>)}
             </select>
           </label>
           <label>Y Parameter:
-            <select value={paramY} onChange={e => setParamY(e.target.value)}>
+            <select value={paramY} onChange={e => setParamY(e.target.value)} className="styled-select" style={{marginLeft: "1.5rem"}}>
               {PARAM_OPTIONS.map(opt => (
                 <option key={opt.key} value={opt.key} style={suggestedY === opt.key ? { background: '#1e7e34', color: '#fff', fontWeight: 600 } : {}}>
                   {opt.label}{suggestedY === opt.key ? ' (suggested)' : ''}
@@ -315,18 +315,18 @@ const AnalysisPage = () => {
           </div>
         )}
         {/* Correlation Line Chart */}
-        <div className="analysis-chart-container">
+        <div className="analysis-chart-container" style={{ background: '#232a3d', borderRadius: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.18)', padding: '1rem' }}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={Object.values(batches).map(batch => {
               const x = extractParamFromSample(batch[timing], paramX);
               const y = extractParamFromSample(batch[timing], paramY);
               return (typeof x === 'number' && typeof y === 'number' && !isNaN(x) && !isNaN(y)) ? { x, y } : null;
-            }).filter(Boolean).sort((a, b) => a.x - b.x)}>
+            }).filter(Boolean).sort((a, b) => a.x - b.x)} style={{ background: '#232a3d' }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
               <XAxis dataKey="x" name={paramX} stroke="#ffd700" />
               <YAxis dataKey="y" name={paramY} stroke="#ffd700" />
-              <RechartsTooltip />
-              <Legend />
+              <RechartsTooltip wrapperStyle={{ backgroundColor: '#232a3d', color: '#ffd700', border: '1px solid #ffd700', borderRadius: 8 }} contentStyle={{ backgroundColor: '#232a3d', color: '#ffd700', border: '1px solid #ffd700', borderRadius: 8 }} labelStyle={{ color: '#ffd700' }} />
+              <Legend wrapperStyle={{ color: '#ffd700' }} />
               <Line type="monotone" dataKey="y" stroke="#ffd700" strokeWidth={2} dot={{ r: 4 }} name={paramY + ' vs ' + paramX} />
             </LineChart>
           </ResponsiveContainer>

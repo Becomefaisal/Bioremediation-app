@@ -155,7 +155,7 @@ const Dashboard = () => {
 
   return (
     <div style={{color:'#fff', padding: 32}}>
-      <h1 style={{color:'#ffd700', marginBottom: 32}}>Summary</h1>
+      <h1 style={{color:'#0d1b1e', marginBottom: 32}}>Summary</h1>
       {/* Interactive Filters - moved above cards */}
       <div className="dashboard-filters" style={{marginBottom: '2.5rem'}}>
         <label htmlFor="method-select">Method:</label>
