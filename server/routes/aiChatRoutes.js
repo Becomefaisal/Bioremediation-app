@@ -13,12 +13,9 @@ async function queryOpenRouterFollowup(sample, question) {
   // Compose a prompt that includes the entire sample as context
   const sampleDetails = JSON.stringify(sample, null, 2);
   const prompt = `You are an expert in bioremediation. Given the following sample data, answer the user's question in 3-5 sentences. Be concise, direct, and use the data provided.\n\nSample Data (JSON):\n${sampleDetails}\n\nUser's Question: ${question}\n\nAnswer:`;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
   const body = {
-    contents: [{
-      role: "user",
-      parts: [{ text: prompt }]
-    }]
+    contents: [{ parts: [{ text: prompt }] }]
   };
   const response = await axios.post(url, body, {
     headers: { 'Content-Type': 'application/json' }
