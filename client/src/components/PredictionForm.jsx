@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import SampleAskTab from './SampleAskTab';
 import './PredictionForm.css';
 
@@ -71,7 +71,99 @@ const PredictionForm = () => {
   const [followUp, setFollowUp] = useState('');
   const [asking, setAsking] = useState(false);
   const [lastPredictedInput, setLastPredictedInput] = useState(null); // Store input used for last prediction
+  const [previewImage, setPreviewImage] = useState('');
+  const [previewLabel, setPreviewLabel] = useState('');
+  const [cameraOn, setCameraOn] = useState(false);
+  const [cameraStream, setCameraStream] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
   const apiUrl = import.meta.env.VITE_API_URL;
+
+  const startCamera = async () => {
+    try {
+      if (cameraOn) return;
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setCameraStream(stream);
+      setCameraOn(true);
+      setPreviewLabel('Live camera preview (initializing)');
+    } catch (err) {
+      console.error('Error enabling camera', err);
+      setPreviewLabel('Camera access denied or unavailable.');
+      setCameraOn(false);
+      setCameraStream(null);
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach((track) => track.stop());
+      setCameraStream(null);
+    }
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.srcObject = null;
+    }
+    setCameraOn(false);
+    setPreviewLabel('Camera stopped.');
+  };
+
+  const takeSnapshot = () => {
+    if (!cameraOn) {
+      setPreviewLabel('Camera not started. Press Start Camera first.');
+      return;
+    }
+    if (!videoRef.current || !canvasRef.current) {
+      setPreviewLabel('Snapshot failed: camera not ready.');
+      return;
+    }
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/png');
+    setPreviewImage(dataUrl);
+    setPreviewLabel('Captured from camera');
+    // do not send to server; retained only for local preview
+  };
+
+  React.useEffect(() => {
+    if (!cameraOn || !cameraStream || !videoRef.current) return;
+    const videoEl = videoRef.current;
+    videoEl.srcObject = cameraStream;
+    videoEl.muted = true;
+    videoEl.playsInline = true;
+
+    const playPromise = videoEl.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((playErr) => {
+        console.warn('Video playback blocked by browser policy', playErr);
+        setPreviewLabel('Live stream started, but auto-play blocked. Click Take Snapshot when ready.');
+      });
+    }
+
+    const cleanup = () => {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach((track) => track.stop());
+      }
+      if (videoEl) {
+        videoEl.pause();
+        videoEl.srcObject = null;
+      }
+    };
+
+    return cleanup;
+  }, [cameraOn, cameraStream]);
+
+  React.useEffect(() => {
+    return () => {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [cameraStream]);
 
   const handleChange = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -162,6 +254,18 @@ const PredictionForm = () => {
     }
     setAsking(false);
     setQuestion('');
+  };
+
+  const uploadImage = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPreviewLabel(`Uploaded: ${file.name}`);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPreviewImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
   };
 
   const handleFollowUp = async (e) => {
@@ -296,6 +400,53 @@ const PredictionForm = () => {
                 />
               </label>
             </div>
+            <div className="form-row" style={{ alignItems: 'center', gap: '0.5rem' }}>
+              {!cameraOn ? (
+                <button type="button" onClick={startCamera} className="form-btn" style={{ padding: '0.5rem 0.8rem' }}>📷 Start Camera</button>
+              ) : (
+                <>
+                  <button type="button" onClick={takeSnapshot} className="form-btn" style={{ padding: '0.5rem 0.8rem' }}>📸 Take Snapshot</button>
+                  <button type="button" onClick={stopCamera} className="form-btn" style={{ padding: '0.5rem 0.8rem' }}>✖️ Stop Camera</button>
+                </>
+              )}
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="form-btn" style={{ padding: '0.5rem 0.8rem' }}>⬆️ Upload Image</button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={uploadImage}
+              />
+            </div>
+
+            <div className="form-row" style={{ marginTop: '0.8rem', gap: '1rem' }}>
+              <div style={{ flex: 1, minWidth: '260px' }}>
+                <div style={{ color: '#fff', fontSize: '0.9rem', marginBottom: '0.3rem' }}>Live Camera Feed</div>
+                <div style={{ width: '100%', minHeight: '180px', borderRadius: '8px', border: '1px solid #444', background: '#121623', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {cameraOn ? (
+                    <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+                  ) : (
+                    <div style={{ color: '#aaa', textAlign: 'center', padding: '0.8rem' }}>Camera is off. Click Start Camera.</div>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ flex: 1, minWidth: '260px' }}>
+                <div style={{ color: '#fff', fontSize: '0.9rem', marginBottom: '0.3rem' }}>Captured / Uploaded Image</div>
+                <div style={{ width: '100%', minHeight: '180px', borderRadius: '8px', border: '1px solid #444', background: '#121623', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {previewImage ? (
+                    <img src={previewImage} alt="preview" style={{ width: '100%', maxHeight: '180px', objectFit: 'contain', borderRadius: '8px' }} />
+                  ) : (
+                    <div style={{ color: '#aaa', textAlign: 'center', padding: '0.8rem' }}>No image captured/uploaded yet.</div>
+                  )}
+                </div>
+                {previewLabel && <div style={{ color: '#fff', fontSize: '0.85rem', marginTop: '0.5rem' }}>{previewLabel}</div>}
+              </div>
+            </div>
+
+            {/* Hidden canvas used for snapshot capture */}
+            <canvas ref={canvasRef} style={{ display: 'none' }} />
+
             <button type="submit" disabled={loading}>Predict</button>
           </form>
           {loading && <p className="status-info">{status}</p>}

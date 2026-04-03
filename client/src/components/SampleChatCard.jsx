@@ -12,7 +12,26 @@ function SampleChatCard({ sample, onBack }) {
   const [asking, setAsking] = useState(false);
   const [error, setError] = useState(null);
   const [abortController, setAbortController] = useState(null);
+  const [uploadedImageName, setUploadedImageName] = useState('');
   const chatEndRef = useRef(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadedImageName(file.name);
+      // read file to memory but do nothing with it
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.log('Uploaded image data (not used):', reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+    // clear input so same file can be uploaded again if needed
+    e.target.value = '';
+  };
 
   React.useEffect(() => {
     if (chatEndRef.current) {
@@ -84,6 +103,28 @@ function SampleChatCard({ sample, onBack }) {
     setAsking(false);
     setFollowUp('');
     setAbortController(null);
+  };
+
+  const captureImage = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoRef.current.srcObject = stream;
+      videoRef.current.play();
+      // Wait a bit for video to load
+      setTimeout(() => {
+        const canvas = canvasRef.current;
+        const video = videoRef.current;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0);
+        // Stop the stream
+        stream.getTracks().forEach(track => track.stop());
+        // Do nothing with the image
+      }, 1000);
+    } catch (err) {
+      console.error('Error accessing camera:', err);
+    }
   };
 
   return (
@@ -180,6 +221,8 @@ function SampleChatCard({ sample, onBack }) {
             placeholder="Type your question..."
             disabled={asking}
           />
+          <button type="button" onClick={captureImage} className="form-btn" style={{marginRight: '0.5rem'}}>📷 Capture Image</button>
+          <button type="button" onClick={() => fileInputRef.current?.click()} className="form-btn" style={{marginRight: '0.5rem'}}>⬆️ Upload Image</button>
           <button className="form-btn" type="submit" disabled={asking || !question.trim()}>{asking ? 'Asking...' : 'Ask'}</button>
         </form>
       ) : (
@@ -194,6 +237,8 @@ function SampleChatCard({ sample, onBack }) {
               disabled={asking}
             />
           </label>
+          <button type="button" onClick={captureImage} className="send-btn" style={{marginRight: '0.5rem'}}>📷 Capture Image</button>
+          <button type="button" onClick={() => fileInputRef.current?.click()} className="send-btn" style={{marginRight: '0.5rem'}}>⬆️ Upload Image</button>
           <button type="submit" className="send-btn" disabled={asking || !followUp.trim()} style={{marginTop:'0.5rem'}}>Send</button>
         </form>
       )}
@@ -201,11 +246,19 @@ function SampleChatCard({ sample, onBack }) {
         <button type="button" onClick={() => abortController.abort()} style={{marginBottom:'1rem',background:'#c62828',color:'#fff',padding:'8px 18px',border:'none',borderRadius:'6px',fontWeight:600,cursor:'pointer'}}>Stop Prediction</button>
       )}
       {asking && <div className="status-info">AI is thinking...</div>}
+      {uploadedImageName && <div className="status-info">Uploaded image: {uploadedImageName}</div>}
+      <video ref={videoRef} style={{display: 'none'}}></video>
+      <canvas ref={canvasRef} style={{display: 'none'}}></canvas>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleImageUpload}
+      />
     </div>
   );
 }
-
-// Clean sample AI response to match main AI response (remove 'thinking', 'undefined', etc)
 function cleanSampleResponse(text) {
   if (!text) return '';
   // Remove <think>...</think> and [think]...[/think] and similar, but avoid unicode/angle brackets that break JSX
