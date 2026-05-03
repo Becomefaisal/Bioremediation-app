@@ -43,7 +43,7 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  background: #f4f6fc;
+  background: #fff;
 }
 
 .logo {
@@ -96,5 +96,5 @@
   box-shadow: 0 4px 32px rgba(34,58,95,0.18);
 }
 body{
-  background: #f4f6fc;
+  background: #fff;
 }

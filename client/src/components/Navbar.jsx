@@ -7,29 +7,21 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-header">
-        {!open && (
-          <div className="navbar-logo">Bioremediation</div>
-        )}
+        <div className="navbar-logo">Bioremediation</div>
         <button className="navbar-toggle" aria-label="Toggle navigation" onClick={() => setOpen(o => !o)}>
-          {open ? (
-            <span style={{fontSize: '2rem', color: '#ed3ac9', lineHeight: '1'}}>&#10005;</span>
-          ) : (
-            <>
-              <span className="navbar-toggle-bar"></span>
-              <span className="navbar-toggle-bar"></span>
-              <span className="navbar-toggle-bar"></span>
-            </>
-          )}
+          <span className="navbar-toggle-bar"></span>
+          <span className="navbar-toggle-bar"></span>
+          <span className="navbar-toggle-bar"></span>
         </button>
       </div>
-      <div className={`navbar-links${open ? ' open' : ''}`}> 
+      <div className={`navbar-links${open ? ' open' : ''}`}>
         <NavLink to="/dashboard" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Dashboard</NavLink>
         <NavLink to="/add" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Add New Data</NavLink>
-        <NavLink to="/manage" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Manage Data</NavLink>
-        <NavLink to="/analysis" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Analysis</NavLink>
         <NavLink to="/compare" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Compare Methods</NavLink>
         <NavLink to="/timeline" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Timeline</NavLink>
+        <NavLink to="/analysis" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Analysis</NavLink>
         <NavLink to="/prediction" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>AI Prediction</NavLink>
+        <NavLink to="/manage" className={({isActive}) => isActive ? 'active' : ''} onClick={() => setOpen(false)}>Manage Data</NavLink>
       </div>
     </nav>
   );

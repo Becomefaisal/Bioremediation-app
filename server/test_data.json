@@ -1,0 +1,174 @@
+[
+  {
+    "location": "River A, Site 1",
+    "method": {
+      "name": "Bioremediation with Bacteria X",
+      "category": "Biological",
+      "description": "Using bacteria to degrade pollutants in water"
+    },
+    "sampleMeta": {
+      "batchId": "BATCH001",
+      "operator": "John Doe",
+      "timestamp": "2023-10-01T10:00:00Z",
+      "stage": "before"
+    },
+    "measurements": {
+      "waterQuality": {
+        "pH": 6.5,
+        "temperature": 25.0,
+        "turbidity": 15.2,
+        "DO": 7.8,
+        "BOD": 4.5,
+        "COD": 120.0,
+        "TDS": 300.0,
+        "EC": 450.0
+      },
+      "dye": {
+        "name": "Methylene Blue",
+        "initialConcentration": 50.0,
+        "finalConcentration": null,
+        "absorbanceInitial": 0.8,
+        "absorbanceFinal": null,
+        "wavelength": 665
+      },
+      "heavyMetals": {
+        "Cr": 0.5,
+        "Pb": 1.2,
+        "Zn": 2.1,
+        "Cu": 0.8,
+        "Ni": 0.3,
+        "Ammonia": 0.4
+      }
+    },
+    "note": "Initial sample before treatment"
+  },
+  {
+    "location": "River A, Site 1",
+    "method": {
+      "name": "Bioremediation with Bacteria X",
+      "category": "Biological",
+      "description": "Using bacteria to degrade pollutants in water"
+    },
+    "sampleMeta": {
+      "batchId": "BATCH001",
+      "operator": "John Doe",
+      "timestamp": "2023-10-01T12:00:00Z",
+      "stage": "after"
+    },
+    "measurements": {
+      "waterQuality": {
+        "pH": 7.0,
+        "temperature": 24.5,
+        "turbidity": 8.1,
+        "DO": 8.5,
+        "BOD": 2.1,
+        "COD": 80.0,
+        "TDS": 250.0,
+        "EC": 380.0
+      },
+      "dye": {
+        "name": "Methylene Blue",
+        "initialConcentration": 50.0,
+        "finalConcentration": 15.0,
+        "absorbanceInitial": 0.8,
+        "absorbanceFinal": 0.25,
+        "wavelength": 665
+      },
+      "heavyMetals": {
+        "Cr": 0.2,
+        "Pb": 0.5,
+        "Zn": 1.0,
+        "Cu": 0.4,
+        "Ni": 0.1,
+        "Ammonia": 0.2
+      }
+    },
+    "note": "Sample after 2 hours of bioremediation"
+  },
+  {
+    "location": "Lake B, Site 2",
+    "method": {
+      "name": "Chemical Oxidation",
+      "category": "Chemical",
+      "description": "Using oxidants to break down contaminants"
+    },
+    "sampleMeta": {
+      "batchId": "BATCH002",
+      "operator": "Jane Smith",
+      "timestamp": "2023-10-02T09:00:00Z",
+      "stage": "before"
+    },
+    "measurements": {
+      "waterQuality": {
+        "pH": 5.8,
+        "temperature": 22.0,
+        "turbidity": 20.5,
+        "DO": 6.2,
+        "BOD": 6.0,
+        "COD": 150.0,
+        "TDS": 400.0,
+        "EC": 550.0
+      },
+      "dye": {
+        "name": "Crystal Violet",
+        "initialConcentration": 40.0,
+        "finalConcentration": null,
+        "absorbanceInitial": 0.6,
+        "absorbanceFinal": null,
+        "wavelength": 590
+      },
+      "heavyMetals": {
+        "Cr": 1.0,
+        "Pb": 2.5,
+        "Zn": 3.2,
+        "Cu": 1.5,
+        "Ni": 0.8,
+        "Ammonia": 0.7
+      }
+    },
+    "note": "High contamination level observed"
+  },
+  {
+    "location": "Lake B, Site 2",
+    "method": {
+      "name": "Chemical Oxidation",
+      "category": "Chemical",
+      "description": "Using oxidants to break down contaminants"
+    },
+    "sampleMeta": {
+      "batchId": "BATCH002",
+      "operator": "Jane Smith",
+      "timestamp": "2023-10-02T11:00:00Z",
+      "stage": "after"
+    },
+    "measurements": {
+      "waterQuality": {
+        "pH": 6.2,
+        "temperature": 21.5,
+        "turbidity": 12.0,
+        "DO": 7.0,
+        "BOD": 3.5,
+        "COD": 100.0,
+        "TDS": 320.0,
+        "EC": 480.0
+      },
+      "dye": {
+        "name": "Crystal Violet",
+        "initialConcentration": 40.0,
+        "finalConcentration": 10.0,
+        "absorbanceInitial": 0.6,
+        "absorbanceFinal": 0.15,
+        "wavelength": 590
+      },
+      "heavyMetals": {
+        "Cr": 0.4,
+        "Pb": 1.0,
+        "Zn": 1.8,
+        "Cu": 0.7,
+        "Ni": 0.3,
+        "Ammonia": 0.3
+      }
+    },
+    "note": "Significant reduction in pollutants"
+  }
+]
