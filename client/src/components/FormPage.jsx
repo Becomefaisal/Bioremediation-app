@@ -140,7 +140,7 @@ const FormPage = () => {
           }
         }
       };
-      await axios.post('/api/samples/add', payload);
+      await axios.post(`${apiUrl}/api/samples/add`, payload);
       setFormData({
         location: '',
         treatmentMethod: '',

@@ -28,7 +28,5 @@ app.use('/api/samples', require('./routes/sampleRoutes'));
 app.use('/api/predict', require('./routes/predictionRoutes'));
 app.use('/api/ai-chat', require('./routes/aiChatRoutes'));
 
-module.exports = app;
-
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
