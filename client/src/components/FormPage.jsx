@@ -16,8 +16,8 @@ const FormPage = () => {
       dyeName: '', initialConcentration: '', finalConcentration: '', absorbanceBefore: '', absorbanceAfter: '',
     },
     heavyMetals: {
-      before: { Cr: '', Pb: '', Nitrates: '', Ammonia: '' },
-      after: { Cr: '', Pb: '', Nitrates: '', Ammonia: '' },
+      before: { Cr: '', Pb: '', Zn: '', Cu: '', Ni: '', Ammonia: '' },
+      after: { Cr: '', Pb: '', Zn: '', Cu: '', Ni: '', Ammonia: '' },
     },
   });
   const [submitting, setSubmitting] = useState(false);
@@ -116,7 +116,9 @@ const FormPage = () => {
           heavyMetals: {
             Cr: Number(formData.heavyMetals.before.Cr),
             Pb: Number(formData.heavyMetals.before.Pb),
-            Nitrates: Number(formData.heavyMetals.before.Nitrates),
+            Zn: Number(formData.heavyMetals.before.Zn),
+            Cu: Number(formData.heavyMetals.before.Cu),
+            Ni: Number(formData.heavyMetals.before.Ni),
             Ammonia: Number(formData.heavyMetals.before.Ammonia)
           }
         },
@@ -131,7 +133,9 @@ const FormPage = () => {
           heavyMetals: {
             Cr: Number(formData.heavyMetals.after.Cr),
             Pb: Number(formData.heavyMetals.after.Pb),
-            Nitrates: Number(formData.heavyMetals.after.Nitrates),
+            Zn: Number(formData.heavyMetals.after.Zn),
+            Cu: Number(formData.heavyMetals.after.Cu),
+            Ni: Number(formData.heavyMetals.after.Ni),
             Ammonia: Number(formData.heavyMetals.after.Ammonia)
           }
         }
@@ -148,8 +152,8 @@ const FormPage = () => {
           dyeName: '', initialConcentration: '', finalConcentration: '', absorbanceBefore: '', absorbanceAfter: '',
         },
         heavyMetals: {
-          before: { Cr: '', Pb: '', Nitrates: '', Ammonia: '' },
-          after: { Cr: '', Pb: '', Nitrates: '', Ammonia: '' },
+          before: { Cr: '', Pb: '', Zn: '', Cu: '', Ni: '', Ammonia: '' },
+          after: { Cr: '', Pb: '', Zn: '', Cu: '', Ni: '', Ammonia: '' },
         },
       });
       alert('Sample data submitted successfully!');
@@ -261,8 +265,12 @@ const FormPage = () => {
               <input className="form-input" type="number" step="any" value={formData.heavyMetals.before.Cr} onChange={e => handleChange(e, 'heavyMetals', 'before', 'Cr')} placeholder="e.g. 0.6 (mg/L)" />
               <label className="form-label">Pb (Before)</label>
               <input className="form-input" type="number" step="any" value={formData.heavyMetals.before.Pb} onChange={e => handleChange(e, 'heavyMetals', 'before', 'Pb')} placeholder="e.g. 0.2 (mg/L)" />
-              <label className="form-label">Nitrates (Before)</label>
-              <input className="form-input" type="number" step="any" value={formData.heavyMetals.before.Nitrates} onChange={e => handleChange(e, 'heavyMetals', 'before', 'Nitrates')} placeholder="e.g. 1.0 (mg/L)" />
+              <label className="form-label">Zn (Before)</label>
+              <input className="form-input" type="number" step="any" value={formData.heavyMetals.before.Zn} onChange={e => handleChange(e, 'heavyMetals', 'before', 'Zn')} placeholder="e.g. 2.1 (mg/L)" />
+              <label className="form-label">Cu (Before)</label>
+              <input className="form-input" type="number" step="any" value={formData.heavyMetals.before.Cu} onChange={e => handleChange(e, 'heavyMetals', 'before', 'Cu')} placeholder="e.g. 0.8 (mg/L)" />
+              <label className="form-label">Ni (Before)</label>
+              <input className="form-input" type="number" step="any" value={formData.heavyMetals.before.Ni} onChange={e => handleChange(e, 'heavyMetals', 'before', 'Ni')} placeholder="e.g. 0.3 (mg/L)" />
               <label className="form-label">Ammonia (Before)</label>
               <input className="form-input" type="number" step="any" value={formData.heavyMetals.before.Ammonia} onChange={e => handleChange(e, 'heavyMetals', 'before', 'Ammonia')} placeholder="e.g. 1.8 (mg/L)" />
             </div>
@@ -275,8 +283,12 @@ const FormPage = () => {
               <input className="form-input" type="number" step="any" value={formData.heavyMetals.after.Cr} onChange={e => handleChange(e, 'heavyMetals', 'after', 'Cr')} placeholder="e.g. 0.1 (mg/L)" />
               <label className="form-label">Pb (After)</label>
               <input className="form-input" type="number" step="any" value={formData.heavyMetals.after.Pb} onChange={e => handleChange(e, 'heavyMetals', 'after', 'Pb')} placeholder="e.g. 0.05 (mg/L)" />
-              <label className="form-label">Nitrates (After)</label>
-              <input className="form-input" type="number" step="any" value={formData.heavyMetals.after.Nitrates} onChange={e => handleChange(e, 'heavyMetals', 'after', 'Nitrates')} placeholder="e.g. 0.2 (mg/L)" />
+              <label className="form-label">Zn (After)</label>
+              <input className="form-input" type="number" step="any" value={formData.heavyMetals.after.Zn} onChange={e => handleChange(e, 'heavyMetals', 'after', 'Zn')} placeholder="e.g. 1.0 (mg/L)" />
+              <label className="form-label">Cu (After)</label>
+              <input className="form-input" type="number" step="any" value={formData.heavyMetals.after.Cu} onChange={e => handleChange(e, 'heavyMetals', 'after', 'Cu')} placeholder="e.g. 0.4 (mg/L)" />
+              <label className="form-label">Ni (After)</label>
+              <input className="form-input" type="number" step="any" value={formData.heavyMetals.after.Ni} onChange={e => handleChange(e, 'heavyMetals', 'after', 'Ni')} placeholder="e.g. 0.1 (mg/L)" />
               <label className="form-label">Ammonia (After)</label>
               <input className="form-input" type="number" step="any" value={formData.heavyMetals.after.Ammonia} onChange={e => handleChange(e, 'heavyMetals', 'after', 'Ammonia')} placeholder="e.g. 0.3 (mg/L)" />
             </div>
