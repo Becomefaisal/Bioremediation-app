@@ -6,7 +6,8 @@ require('dotenv').config();
 const app = express();
 
 const allowedOrigins = [
-  'https://bioremediation-app.vercel.app'
+  'https://bioremediation-app.vercel.app',
+  'https://bioremediation-8h6yar8wd-becomefaisals-projects.vercel.app'
 ];
 
 const corsOptions = {
