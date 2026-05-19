@@ -9,7 +9,7 @@ app.use(cors({
     // Allow all Vercel preview/production domains and localhost
     if (!origin ||
         origin.endsWith('.vercel.app') ||
-        origin === 'https://bioremediation.vercel.app' ||
+        origin === 'https://bioremediation-app.vercel.app' ||
         origin.startsWith('http://localhost')) {
       callback(null, true);
     } else {
