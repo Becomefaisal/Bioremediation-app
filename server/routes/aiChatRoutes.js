@@ -10,20 +10,23 @@ require('dotenv').config();
 
 const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY;
 async function queryOpenRouterFollowup(sample, question) {
-  // Compose a prompt that includes the entire sample as context
+  if (!GEMINI_API_KEY) {
+    throw new Error('Missing GOOGLE_GEMINI_API_KEY. Set this environment variable in Render or your local .env file.');
+  }
+
   const sampleDetails = JSON.stringify(sample, null, 2);
   const prompt = `You are an expert in bioremediation. Given the following sample data, answer the user's question in 3-5 sentences. Be concise, direct, and use the data provided.\n\nSample Data (JSON):\n${sampleDetails}\n\nUser's Question: ${question}\n\nAnswer:`;
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
   const body = {
-    contents: [{ parts: [{ text: prompt }] }]
+    contents: [{
+      parts: [{ text: prompt }]
+    }]
   };
   const response = await axios.post(url, body, {
     headers: { 'Content-Type': 'application/json' }
   });
-  const aiMessage = response.data.candidates && response.data.candidates[0] && response.data.candidates[0].content && response.data.candidates[0].content.parts && response.data.candidates[0].content.parts[0].text
-    ? response.data.candidates[0].content.parts[0].text.trim()
-    : 'No answer returned.';
-  return aiMessage;
+  const aiMessage = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No answer returned.';
+  return aiMessage.trim();
 }
 
 router.post('/ask', async (req, res) => {
